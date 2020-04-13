@@ -1,0 +1,455 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{7f3b3908-7a52-40fc-a4ae-bd2ef2e49387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\Interface">
+      <UniqueIdentifier>{68eea29d-7aac-4546-844d-23c3056c28d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\Math">
+      <UniqueIdentifier>{5aa2c661-8c94-45cb-b84d-4eab89b997b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\Pattern">
+      <UniqueIdentifier>{1df7f116-0fb4-4544-8b3e-97f8a1f25e95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\GetVirtual">
+      <UniqueIdentifier>{e7885157-37e2-488a-be50-5ac397514559}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\VMTHooks">
+      <UniqueIdentifier>{d6e9c9c8-bc51-435b-8a65-f9b8108c8e67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK">
+      <UniqueIdentifier>{2050505a-a76a-4ce1-819e-fd1ec3654694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces">
+      <UniqueIdentifier>{065f68e1-b3aa-4eee-8bf8-40a555e302c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CEngineClient">
+      <UniqueIdentifier>{1dcfeef1-0f84-4847-a408-18874238d3f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CEntityList">
+      <UniqueIdentifier>{16441b43-cd67-4dfa-9d75-1b782e03efdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CGlobals">
+      <UniqueIdentifier>{1d4ba814-e825-4359-bcbd-4bf6ea898b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CHLClient">
+      <UniqueIdentifier>{72823afd-e02b-48d9-99be-8ff396d68c3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CModelInfo">
+      <UniqueIdentifier>{6c1c5da8-927a-4c5e-9bcd-f02ed7484a09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CClientModeShared">
+      <UniqueIdentifier>{683e6a40-51b1-4807-bf9b-ae32dcb6ae2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IEngineTrace">
+      <UniqueIdentifier>{a34b2872-702b-4300-aa37-e532282927bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IMoveHelper">
+      <UniqueIdentifier>{febdb6fc-b26d-4a95-91cd-4152a7a86617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IPrediction">
+      <UniqueIdentifier>{66d7a3a0-0cc8-4d2c-81c9-6d0778dc64b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IGameMovement">
+      <UniqueIdentifier>{d65647f5-5a5b-4fd8-8ebb-548474fbd6be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules">
+      <UniqueIdentifier>{98291adb-3fa8-46f0-8eb4-a2c6305f6e07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IPanel">
+      <UniqueIdentifier>{f2cef581-9c88-41f4-aeae-94f563d376be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\ISurface">
+      <UniqueIdentifier>{bfaa881c-1718-4c57-8569-29240fa87626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\Color">
+      <UniqueIdentifier>{0af28b7c-7b77-4dec-8e50-410b4413217a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\Input">
+      <UniqueIdentifier>{93636ed5-913a-4bbb-b0ee-05c029c9d961}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks">
+      <UniqueIdentifier>{d2140742-be94-498b-9a89-29753caefea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\CreateMove">
+      <UniqueIdentifier>{0434fb1f-35cd-43a8-b450-516dca01d8d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\DirectX">
+      <UniqueIdentifier>{a1439172-3ee5-41e1-aa39-e4edbb6cc213}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\LockCursor">
+      <UniqueIdentifier>{1a5fbcdb-658d-45eb-8c8d-e24c5b29498d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\PaintTraverse">
+      <UniqueIdentifier>{366cd0b1-8895-4e2d-8e87-caeb7ef9ff6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DynamicNetvars">
+      <UniqueIdentifier>{f3a27c6e-2373-4a63-aebc-8a484d607630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DynamicNetvars\DT">
+      <UniqueIdentifier>{9af53b11-ba07-4207-8a92-a4b8f63a25c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui">
+      <UniqueIdentifier>{584e0b52-6abd-41dc-9148-75cd90d68407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\WndProc">
+      <UniqueIdentifier>{12864d59-400a-473e-80c0-f09c1a59363a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Menu">
+      <UniqueIdentifier>{78ca18c9-5d54-4777-acab-c950f3db6aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\ESP">
+      <UniqueIdentifier>{dbc405b9-0f14-47b6-9ea9-c6f750311c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\OverrideView">
+      <UniqueIdentifier>{979e54a9-7e2f-42fd-83f6-302af82d09c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\ShouldDrawViewmodel">
+      <UniqueIdentifier>{168db2ee-a035-48a8-8bea-708c5277acb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Misc">
+      <UniqueIdentifier>{86288297-f231-4b8d-abf3-9f8716a4b07a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IMaterial">
+      <UniqueIdentifier>{ba7421f9-eca5-491c-9ff1-c3d1bea81c19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IMaterialSystem">
+      <UniqueIdentifier>{5a2fff11-9233-4fd2-bbff-b15fedfefce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CModelRender">
+      <UniqueIdentifier>{609aaa21-700e-47b9-ad72-f0f19e3df480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CRenderView">
+      <UniqueIdentifier>{da9d7d73-b9d7-4738-b6b1-95ce4d8fa418}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\DrawModelExecute">
+      <UniqueIdentifier>{950e57de-59fd-4699-a860-737a2abe9f51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\SceneEnd">
+      <UniqueIdentifier>{8ca5e961-21e4-492f-8d41-c4ec4703713b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Chams">
+      <UniqueIdentifier>{62421551-077f-48f3-9654-b4d3cb3bbded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Aimbot">
+      <UniqueIdentifier>{3f8908d8-a238-4bed-bec2-4475412ec30d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\RunCommand">
+      <UniqueIdentifier>{543d6c20-b857-4236-89fb-f55e1f5146a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Hooks\FrameStageNotify">
+      <UniqueIdentifier>{fe0db0ed-819b-42cf-8e76-fc971b854dcd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DllMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Interface\Interface.cpp">
+      <Filter>Header Files\Helpers\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Pattern\Pattern.cpp">
+      <Filter>Header Files\Helpers\Pattern</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\VMTHooks\VMTHooks.cpp">
+      <Filter>Header Files\Helpers\VMTHooks</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CEngineClient\CEngineClient.cpp">
+      <Filter>Header Files\SDK\Interfaces\CEngineClient</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CEntityList\CEntityList.cpp">
+      <Filter>Header Files\SDK\Interfaces\CEntityList</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CHLClient\CHLClient.cpp">
+      <Filter>Header Files\SDK\Interfaces\CHLClient</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CModelInfo\CModelInfo.cpp">
+      <Filter>Header Files\SDK\Interfaces\CModelInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\Interfaces.cpp">
+      <Filter>Header Files\SDK\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CClientModeShared\CClientModeShared.cpp">
+      <Filter>Header Files\SDK\Interfaces\CClientModeShared</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IEngineTrace\IEngineTrace.cpp">
+      <Filter>Header Files\SDK\Interfaces\IEngineTrace</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IMoveHelper\IMoveHelper.cpp">
+      <Filter>Header Files\SDK\Interfaces\IMoveHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IPrediction\IPrediction.cpp">
+      <Filter>Header Files\SDK\Interfaces\IPrediction</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IPanel\IPanel.cpp">
+      <Filter>Header Files\SDK\Interfaces\IPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\ISurface\ISurface.cpp">
+      <Filter>Header Files\SDK\Interfaces\ISurface</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\SDK.cpp">
+      <Filter>Header Files\SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Color\Color.cpp">
+      <Filter>Header Files\Helpers\Color</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Input\Input.cpp">
+      <Filter>Header Files\Helpers\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\CreateMove\CreateMove.cpp">
+      <Filter>Header Files\Hooks\CreateMove</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\DirectX\DirectX.cpp">
+      <Filter>Header Files\Hooks\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\LockCursor\LockCursor.cpp">
+      <Filter>Header Files\Hooks\LockCursor</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\PaintTraverse\PaintTraverse.cpp">
+      <Filter>Header Files\Hooks\PaintTraverse</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\Hooks.cpp">
+      <Filter>Header Files\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicNetvars\DynamicNetvars.cpp">
+      <Filter>Header Files\DynamicNetvars</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\WndProc\WndProc.cpp">
+      <Filter>Header Files\Hooks\WndProc</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Menu\Menu.cpp">
+      <Filter>Header Files\Modules\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\ESP\ESP.cpp">
+      <Filter>Header Files\Modules\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\ShouldDrawViewmodel\ShouldDrawViewmodel.cpp">
+      <Filter>Header Files\Hooks\ShouldDrawViewmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\OverrideView\OverrideView.cpp">
+      <Filter>Header Files\Hooks\OverrideView</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Misc\Misc.cpp">
+      <Filter>Header Files\Modules\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IMaterialSystem\IMaterialSystem.cpp">
+      <Filter>Header Files\SDK\Interfaces\IMaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\CModelRender\CModelRender.cpp">
+      <Filter>Header Files\SDK\Interfaces\CModelRender</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\DrawModelExecute\DrawModelExecute.cpp">
+      <Filter>Header Files\Hooks\DrawModelExecute</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\SceneEnd\SceneEnd.cpp">
+      <Filter>Header Files\Hooks\SceneEnd</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Chams\Chams.cpp">
+      <Filter>Header Files\Modules\Chams</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>Header Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Aimbot\Aimbot.cpp">
+      <Filter>Header Files\Modules\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\RunCommand\RunCommand.cpp">
+      <Filter>Header Files\Hooks\RunCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\FrameStageNotify\FrameStageNotify.cpp">
+      <Filter>Header Files\Hooks\FrameStageNotify</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Helpers\Interface\Interface.h">
+      <Filter>Header Files\Helpers\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Math\Math.h">
+      <Filter>Header Files\Helpers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Pattern\Pattern.h">
+      <Filter>Header Files\Helpers\Pattern</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\GetVirtual\GetVirtual.h">
+      <Filter>Header Files\Helpers\GetVirtual</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\VMTHooks\VMTHooks.h">
+      <Filter>Header Files\Helpers\VMTHooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Defines.h">
+      <Filter>Header Files\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Helpers.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CEngineClient\CEngineClient.h">
+      <Filter>Header Files\SDK\Interfaces\CEngineClient</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CEntityList\CEntityList.h">
+      <Filter>Header Files\SDK\Interfaces\CEntityList</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CGlobals\CGlobals.h">
+      <Filter>Header Files\SDK\Interfaces\CGlobals</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CHLClient\CHLClient.h">
+      <Filter>Header Files\SDK\Interfaces\CHLClient</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CModelInfo\CModelInfo.h">
+      <Filter>Header Files\SDK\Interfaces\CModelInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\Interfaces.h">
+      <Filter>Header Files\SDK\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CClientModeShared\CClientModeShared.h">
+      <Filter>Header Files\SDK\Interfaces\CClientModeShared</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IEngineTrace\IEngineTrace.h">
+      <Filter>Header Files\SDK\Interfaces\IEngineTrace</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IMoveHelper\IMoveHelper.h">
+      <Filter>Header Files\SDK\Interfaces\IMoveHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IPrediction\IPrediction.h">
+      <Filter>Header Files\SDK\Interfaces\IPrediction</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IGameMovement\IGameMovement.h">
+      <Filter>Header Files\SDK\Interfaces\IGameMovement</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\SDK.h">
+      <Filter>Header Files\SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IPanel\IPanel.h">
+      <Filter>Header Files\SDK\Interfaces\IPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\ISurface\ISurface.h">
+      <Filter>Header Files\SDK\Interfaces\ISurface</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Color\Color.h">
+      <Filter>Header Files\Helpers\Color</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Input\Input.h">
+      <Filter>Header Files\Helpers\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\CreateMove\CreateMove.h">
+      <Filter>Header Files\Hooks\CreateMove</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\DirectX\DirectX.h">
+      <Filter>Header Files\Hooks\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\LockCursor\LockCursor.h">
+      <Filter>Header Files\Hooks\LockCursor</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\PaintTraverse\PaintTraverse.h">
+      <Filter>Header Files\Hooks\PaintTraverse</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\Hooks.h">
+      <Filter>Header Files\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicNetvars\DT\dt_common2.h">
+      <Filter>Header Files\DynamicNetvars\DT</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicNetvars\DT\dt_recv2.h">
+      <Filter>Header Files\DynamicNetvars\DT</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicNetvars\DynamicNetvars.h">
+      <Filter>Header Files\DynamicNetvars</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx9.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_win32.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\WndProc\WndProc.h">
+      <Filter>Header Files\Hooks\WndProc</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Menu\Menu.h">
+      <Filter>Header Files\Modules\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\ESP\ESP.h">
+      <Filter>Header Files\Modules\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\ShouldDrawViewmodel\ShouldDrawViewmodel.h">
+      <Filter>Header Files\Hooks\ShouldDrawViewmodel</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\OverrideView\OverrideView.h">
+      <Filter>Header Files\Hooks\OverrideView</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Misc\Misc.h">
+      <Filter>Header Files\Modules\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IMaterial\IMaterial.h">
+      <Filter>Header Files\SDK\Interfaces\IMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IMaterialSystem\IMaterialSystem.h">
+      <Filter>Header Files\SDK\Interfaces\IMaterialSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CModelRender\CModelRender.h">
+      <Filter>Header Files\SDK\Interfaces\CModelRender</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CRenderView\CRenderView.h">
+      <Filter>Header Files\SDK\Interfaces\CRenderView</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\DrawModelExecute\DrawModelExecute.h">
+      <Filter>Header Files\Hooks\DrawModelExecute</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\SceneEnd\SceneEnd.h">
+      <Filter>Header Files\Hooks\SceneEnd</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Chams\Chams.h">
+      <Filter>Header Files\Modules\Chams</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Aimbot\Aimbot.h">
+      <Filter>Header Files\Modules\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\RunCommand\RunCommand.h">
+      <Filter>Header Files\Hooks\RunCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\FrameStageNotify\FrameStageNotify.h">
+      <Filter>Header Files\Hooks\FrameStageNotify</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
