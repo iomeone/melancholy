@@ -222,8 +222,15 @@ void CESP::Run()
 	if (pLocal->IsAlive())
 		pLocal->ForceTauntCam(Active && Thirdperson);
 
-	static Draw_t Draw("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-	static Draw_t DrawSmall("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
+	{
+		static bool font_init = false;
+
+		if (!font_init) {
+			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
+			DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
+			font_init = true;
+		}
+	}
 
 	if (GetEntities(pLocal))
 	{
@@ -543,6 +550,11 @@ void CESP::Run()
 			}
 		}
 	}
+}
+
+void CESP::ReloadFonts() {
+	Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
+	DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
 }
 
 CESP gESP;

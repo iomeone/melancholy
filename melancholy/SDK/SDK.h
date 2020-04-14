@@ -209,7 +209,7 @@ namespace Math
 	}
 }
 
-//these are for lazily avoiding .h .cpp stuff
+//these are for lazily avoiding .h .cpp
 namespace Utils
 {
 	template <typename T>

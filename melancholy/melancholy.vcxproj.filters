@@ -153,6 +153,9 @@
     <Filter Include="Header Files\Modules\Aimbot\ProjectileSolver">
       <UniqueIdentifier>{a1e9890d-9cd4-4766-8912-ee03b46eeaf7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Hooks\OnScreenSizeChanged">
+      <UniqueIdentifier>{73cc828f-83e0-4a6c-957f-04b2fc3f7b93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.cpp">
       <Filter>Header Files\Modules\Aimbot\ProjectileSolver</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.cpp">
+      <Filter>Header Files\Hooks\OnScreenSizeChanged</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -459,6 +465,9 @@
     </ClInclude>
     <ClInclude Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.h">
       <Filter>Header Files\Modules\Aimbot\ProjectileSolver</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.h">
+      <Filter>Header Files\Hooks\OnScreenSizeChanged</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

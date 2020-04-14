@@ -299,21 +299,6 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
-		CProjectileWeapon ProjectileWep(pLocalWeapon);
-
-		if (ProjectileWep.GetWeaponInfo().speed > 0.0f)
-		{
-			target.ent_pos.z -= 15.0f;
-
-			CLinearPredictor Predictor(target.ent_pos, target.ptr->GetVelocity());
-			Solution_t Solution = {};
-
-			if (Solve(target.local_pos, ProjectileWep, Predictor, Solution))
-				target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
-
-			else return;
-		}
-
 		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped())) {
 			SmoothStartTime = gInts.Globals->curtime;
 			SmoothStartAngle = cmd->viewangles;

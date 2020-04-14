@@ -30,6 +30,7 @@ void Hooks_t::Initialize()
 		SurfaceHook = new VMTBaseManager();
 		SurfaceHook->Init(gInts.Surface);
 		SurfaceHook->HookMethod(&LockCursor::Hook, LockCursor::Index);
+		SurfaceHook->HookMethod(&OnScreenSizeChanged::Hook, OnScreenSizeChanged::Index);
 		SurfaceHook->Rehook();
 	}
 
@@ -67,6 +68,8 @@ void Hooks_t::Initialize()
 		hwTF2Window = FindWindowA(0, "Team Fortress 2");
 
 	WndProc::pWindowProc = (WNDPROC)SetWindowLongPtr(hwTF2Window, GWL_WNDPROC, (LONG_PTR)&WndProc::Hook);
+
+	gScreenSize.Update(); //UPDATE YOU PIECE OF SHIT
 }
 
 Hooks_t gHooks;

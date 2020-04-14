@@ -10,6 +10,7 @@
 #include "SceneEnd/SceneEnd.h"
 #include "RunCommand/RunCommand.h"
 #include "FrameStageNotify/FrameStageNotify.h"
+#include "OnScreenSizeChanged/OnScreenSizeChanged.h"
 
 struct Hooks_t
 {

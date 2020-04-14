@@ -2,7 +2,12 @@
 
 //-------------------------------------------------- CProjectileWeapon
 
-ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const {
+CProjectileWeapon::CProjectileWeapon(CBaseCombatWeapon *wep) {
+	ProjectileWeapon = wep;
+}
+
+ProjectileInfo_t CProjectileWeapon::GetWeaponInfo()
+{
 	if (!ProjectileWeapon)
 		return {};
 
@@ -82,60 +87,5 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const {
 		}
 	}
 
-	return { out.speed, (out.gravity * 800.0f) + 0.01f }; //need + 0.01f to get non gravity affected weapons to work
-}
-
-Vec3 CProjectileWeapon::GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const { return (target - origin); }
-
-//-------------------------------------------------- CLinearPredictor
-
-Vec3 CLinearPredictor::PredictPosition(float time) const { return (origin + velocity * time); }
-
-//-------------------------------------------------- Solver
-
-bool Optimal(float x, float y, float v0, float g, float &pitch)
-{
-	const float root = v0 * v0 * v0 * v0 - g * (g * x * x + 2.0f * y * v0 * v0);
-
-	if (root < 0.0f)
-		return false;
-
-	pitch = atan((v0 * v0 - sqrt(root)) / (g * x));
-
-	return true;
-}
-
-static bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &target, Solution_t &sol)
-{
-	const auto v	= weapon.GetProjectileFireSetup(origin, target);
-	const float dx	= sqrt(v.x * v.x + v.y * v.y);
-	const float dy	= v.z;
-	const float v0	= weapon.GetWeaponInfo().speed;
-	const float g	= weapon.GetWeaponInfo().gravity;
-
-	if (!Optimal(dx, dy, v0, g, sol.pitch))
-		return false;
-
-	sol.time = dx / (cos(sol.pitch) * v0);
-	sol.yaw = atan2(v.y, v.x);
-
-	return true;
-}
-
-bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CTargetPredictor &target, Solution_t &sol)
-{
-	static const float MAX_TIME = 1.0f;
-	static const float TIME_STEP = 1.0 / 256.0f;
-
-	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP) {
-		const auto target_pos = target.PredictPosition(target_time);
-
-		if (!Solve2D(origin, weapon, target_pos, sol))
-			return false;
-
-		if (sol.time < target_time)
-			return true;
-	}
-
-	return false;
+	return out;
 }

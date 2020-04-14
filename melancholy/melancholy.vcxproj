@@ -161,6 +161,7 @@
     <ClCompile Include="Hooks\FrameStageNotify\FrameStageNotify.cpp" />
     <ClCompile Include="Hooks\Hooks.cpp" />
     <ClCompile Include="Hooks\LockCursor\LockCursor.cpp" />
+    <ClCompile Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.cpp" />
     <ClCompile Include="Hooks\OverrideView\OverrideView.cpp" />
     <ClCompile Include="Hooks\PaintTraverse\PaintTraverse.cpp" />
     <ClCompile Include="Hooks\RunCommand\RunCommand.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="Hooks\FrameStageNotify\FrameStageNotify.h" />
     <ClInclude Include="Hooks\Hooks.h" />
     <ClInclude Include="Hooks\LockCursor\LockCursor.h" />
+    <ClInclude Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.h" />
     <ClInclude Include="Hooks\OverrideView\OverrideView.h" />
     <ClInclude Include="Hooks\PaintTraverse\PaintTraverse.h" />
     <ClInclude Include="Hooks\RunCommand\RunCommand.h" />
