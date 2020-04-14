@@ -150,6 +150,9 @@
     <Filter Include="Header Files\Hooks\FrameStageNotify">
       <UniqueIdentifier>{fe0db0ed-819b-42cf-8e76-fc971b854dcd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Modules\Aimbot\ProjectileSolver">
+      <UniqueIdentifier>{a1e9890d-9cd4-4766-8912-ee03b46eeaf7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="Hooks\FrameStageNotify\FrameStageNotify.cpp">
       <Filter>Header Files\Hooks\FrameStageNotify</Filter>
+    </ClCompile>
+    <ClCompile Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.cpp">
+      <Filter>Header Files\Modules\Aimbot\ProjectileSolver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -450,6 +456,9 @@
     </ClInclude>
     <ClInclude Include="Hooks\FrameStageNotify\FrameStageNotify.h">
       <Filter>Header Files\Hooks\FrameStageNotify</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.h">
+      <Filter>Header Files\Modules\Aimbot\ProjectileSolver</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
