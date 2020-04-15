@@ -84,6 +84,12 @@ void ISurface::DrawFilledRectFade(int x0, int y0, int x1, int y1, unsigned int a
 	GetVFunc<FN>(this, 118)(this, x0, y0, x1, y1, alpha0, alpha1, horizontal);
 }
 
+void ISurface::DrawOutlinedCircle(int x, int y, float radius, int segments)
+{
+	typedef void(__thiscall *FN)(PVOID, int, int, float, int);
+	GetVFunc<FN>(this, 103)(this, x, y, radius, segments);
+}
+
 void ISurface::UnlockCursor()
 {
 	typedef void(__thiscall *FN)(PVOID);

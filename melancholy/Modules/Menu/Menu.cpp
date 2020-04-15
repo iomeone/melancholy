@@ -79,7 +79,6 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		bOpen = !bOpen;
 		gInts.Surface->SetCursorAlwaysVisible(bOpen);
-		gScreenSize.Update(); //might as well throw this in here
 	}
 
 	ImGui_ImplDX9_NewFrame();
@@ -204,7 +203,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 					{
 						ImGui::Text("main");
 						ImGui::PushItemWidth(90.0f);
@@ -229,7 +228,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SameLine();
 
-					if (ImGui::BeginChild("local_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+					if (ImGui::BeginChild("local_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 					{
 						ImGui::Text("local");
 						ImGui::PushItemWidth(90.0f);

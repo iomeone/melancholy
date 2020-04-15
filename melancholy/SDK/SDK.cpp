@@ -686,6 +686,19 @@ void Draw_t::GradientRect(int x, int y, int x1, int y1, RGBA_t &top_clr, RGBA_t 
 	gInts.Surface->DrawFilledRectFade(x, y, x + x1, y + y1, 0, 255, false);
 }
 
+void Draw_t::OutlinedCircle(int x, int y, float radius, int segments, RGBA_t &clr)
+{
+	float Step = 3.141 * 2.0 / segments;
+
+	for (float a = 0; a < (3.141 * 2.0); a += Step) {
+		float x1 = radius * cos(a) + x;
+		float y1 = radius * sin(a) + y;
+		float x2 = radius * cos(a + Step) + x;
+		float y2 = radius * sin(a + Step) + y;
+		Line(x1, y1, x2, y2, clr);
+	}
+}
+
 //-------------------------------------------------- KeyValues
 
 bool CKeyVals::LoadFromBuffer(KeyValues *key_value, char const *resource_name, const char *buffer, IFileSystem *file_system, const char *path_id)

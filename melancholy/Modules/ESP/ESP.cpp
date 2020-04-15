@@ -170,6 +170,16 @@ RGBA_t CESP::GetEntityColor(ESPEnt_t &ent)
 
 void CESP::Run()
 {
+	{
+		static bool font_init = false;
+
+		if (!font_init) {
+			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
+			DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
+			font_init = true;
+		}
+	}
+
 	if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible())
 		return;
 
@@ -218,20 +228,7 @@ void CESP::Run()
 			Spectators.push_back({ info.name, mode });
 		}
 	}
-
-	if (pLocal->IsAlive())
-		pLocal->ForceTauntCam(Active && Thirdperson);
-
-	{
-		static bool font_init = false;
-
-		if (!font_init) {
-			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-			DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
-			font_init = true;
-		}
-	}
-
+	
 	if (GetEntities(pLocal))
 	{
 		for (auto &v : Entities)

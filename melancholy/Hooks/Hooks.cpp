@@ -68,8 +68,6 @@ void Hooks_t::Initialize()
 		hwTF2Window = FindWindowA(0, "Team Fortress 2");
 
 	WndProc::pWindowProc = (WNDPROC)SetWindowLongPtr(hwTF2Window, GWL_WNDPROC, (LONG_PTR)&WndProc::Hook);
-
-	gScreenSize.Update(); //UPDATE YOU PIECE OF SHIT
 }
 
 Hooks_t gHooks;

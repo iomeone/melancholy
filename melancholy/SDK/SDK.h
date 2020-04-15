@@ -130,6 +130,7 @@ struct Draw_t
 	void Rect(int x, int y, int w, int h, RGBA_t &clr);
 	void OutlinedRect(int x, int y, int w, int h, RGBA_t &clr);
 	void GradientRect(int x, int y, int x1, int y1, RGBA_t &top_clr, RGBA_t &bottom_clr);
+	void OutlinedCircle(int x, int y, float radius, int segments, RGBA_t &clr);
 };
 
 

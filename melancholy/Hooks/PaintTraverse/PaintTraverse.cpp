@@ -25,11 +25,21 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 
 	if (top_panel == vgui_panel)
 	{
-		static bool once = false;
+		static bool init_screen_size = false;
 
-		if (!once) {
-			gScreenSize.Update();
-			once = true;
+		if (!init_screen_size) {
+			if (!gScreenSize.w || !gScreenSize.h)
+				gScreenSize.Update();
+
+			else init_screen_size = true;
+		}
+
+		if (!init_screen_size)
+			return;
+
+		CBaseEntity *local = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
+		if (local && local->IsAlive()) {
+			local->ForceTauntCam(gESP.Active && gESP.Thirdperson);
 		}
 
 		gESP.Run();

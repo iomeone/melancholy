@@ -20,6 +20,7 @@ public:
 	void GetCursorPos(int &x_out, int &y_out);
 	void SetCursorAlwaysVisible(bool b);
 	void DrawFilledRectFade(int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool horizontal);
+	void DrawOutlinedCircle(int x, int y, float radius, int segments);
 	void UnlockCursor();
 	void LockCursor();
 };
