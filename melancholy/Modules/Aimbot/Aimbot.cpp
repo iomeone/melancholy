@@ -1,14 +1,16 @@
 #include "Aimbot.h"
 
-//TODO: find some magic way to predict moving entities for improved accuraccy,
-//it misses quite a lot at players who are moving very fast through the air.
-//That or there's some missing local player prediction stuff (I'm pretty sure something besides "engine pred" can be done) to improve the accuraccy even more
+//this entire thing is aimed to be used on players, buildings were in mind at some point in development but I scratched them
+//shouldn't be too hard to put 'em in
 
 Vec3 SmoothStartAngle = Vec3();
 float SmoothStartTime = 0.0f;
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
+	//reserve and emplace_back are pretty new here, decided to test 'em for performance
+	Targets.reserve(12); //not a problem if there's more
+
 	if (!Targets.empty())
 		Targets.clear();
 
@@ -39,7 +41,7 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 		float fov		= Math::CalcFov(LocalAngles, ang_to_ent);
 		float dist		= ent_pos.DistTo(LocalPos);
 
-		Targets.push_back({ ent, fov, dist, ang_to_ent, ent_pos, LocalPos });
+		Targets.emplace_back(Target_t{ ent, fov, dist, ang_to_ent, ent_pos, LocalPos });
 	}
 
 	if (Targets.empty())
@@ -206,8 +208,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 	int wep_idx		= wep->GetItemDefinitionIndex();
 	int class_num	= pLocal->GetClassNum();
 
-	if (AimTime > 0.0f)
-	{
+	if (AimTime > 0.0f) {
 		//you can check the easing == 1 for this but it's not good
 		Vec3 vForward = Vec3();
 		Math::AngleVectors(cmd->viewangles, &vForward);
@@ -227,7 +228,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 			if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
 				return false;
 
-			if ((gInts.Globals->curtime - timer) < 0.15f)
+			if ((gInts.Globals->curtime - timer) < 0.05f)
 				return false;
 		}
 
@@ -310,7 +311,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 			gLocalInfo.CurrentTargetIndex = target.ptr->GetIndex();
 
 			if (TargetChanged()) {
-				SmoothStartTime = gInts.Globals->curtime;
+				SmoothStartTime = gInts.Globals->curtime; //these are reset in 4 places, need to do it differently
 				SmoothStartAngle = cmd->viewangles;
 			}
 

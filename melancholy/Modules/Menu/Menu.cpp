@@ -78,7 +78,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 	if (GetAsyncKeyState(VK_INSERT) & 1) {
 		bOpen = !bOpen;
-		gInts.Surface->SetCursorAlwaysVisible(bOpen);
+		gInts.Surface->SetCursorAlwaysVisible(bOpen); //also disables game's mouse clicks
 	}
 
 	ImGui_ImplDX9_NewFrame();

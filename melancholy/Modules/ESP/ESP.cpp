@@ -175,7 +175,7 @@ void CESP::Run()
 
 		if (!font_init) {
 			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-			DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
+			DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
 			font_init = true;
 		}
 	}
@@ -551,7 +551,7 @@ void CESP::Run()
 
 void CESP::ReloadFonts() {
 	Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-	DrawSmall = Draw_t("Arial", FontTallSmall, 0, FONTFLAG_OUTLINE);
+	DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
 }
 
 CESP gESP;
