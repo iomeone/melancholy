@@ -17,7 +17,6 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 
 	switch (ProjectileWeapon->GetItemDefinitionIndex())
 	{
-		//soldier
 		case Soldier_m_RocketLauncher:
 		case Soldier_m_RocketLauncherR:
 		case Soldier_m_TheBlackBox:
@@ -47,7 +46,7 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 		case Soldier_m_CoffinNail:
 		case Soldier_m_HighRollers:
 		case Soldier_m_Warhawk: {
-			out = { 1100, 0.0f };
+			out = { 1100.0f, 0.0f };
 			break;
 		}
 
@@ -57,11 +56,10 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 		}
 
 		case Soldier_m_TheLibertyLauncher: {
-			out = { 1500.0f, 0.0f };
+			out = { 1540.0f, 0.0f };
 			break;
 		}
 
-		//demoman
 		case Demoman_m_GrenadeLauncher:
 		case Demoman_m_GrenadeLauncherR:
 		case Demoman_m_FestiveGrenadeLauncher:
@@ -74,17 +72,63 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 		case Demoman_m_TopShelf:
 		case Demoman_m_Warhawk:
 		case Demoman_m_ButcherBird: {
-			out = { 1200.0f, 0.4f };
+			out = { 1216.6f, 0.4f };
+			break;
+		}
+
+		case Soldier_s_TheRighteousBison:
+		case Engi_m_ThePomson6000: {
+			out = { 1200.0f, 0.0f };
 			break;
 		}
 
 		case Demoman_m_TheLooseCannon: {
-			out = { 1400.0f, 0.4f };
+			out = { 1453.9f, 0.4f };
 			break;
 		}
 
 		case Demoman_m_TheLochnLoad: {
-			out = { 1500.0f, 0.4f };
+			out = { 1513.3f, 0.4f };
+			break;
+		}
+
+		case Engi_m_TheRescueRanger:
+		case Medic_m_FestiveCrusadersCrossbow:
+		case Medic_m_CrusadersCrossbow: {
+			out = { 2400.0f, 0.2f };
+			break;
+		}
+
+		case Pyro_m_DragonsFury: {
+			out = { 3000.0f, 0.0f };
+			break;
+		}
+
+		case Pyro_s_TheDetonator:
+		case Pyro_s_TheFlareGun:
+		case Pyro_s_FestiveFlareGun:
+		case Pyro_s_TheScorchShot: {
+			out = { 2000.0f, 0.2f };
+			break;
+		}
+		case Pyro_s_TheManmelter: {
+			out = { 3000.0f, 0.2f };
+			break;
+		}
+
+		case Medic_m_SyringeGun:
+		case Medic_m_SyringeGunR:
+		case Medic_m_TheBlutsauger:
+		case Medic_m_TheOverdose: {
+			out = { 1000.0f, 0.2f };
+			break;
+		}
+
+		case Sniper_m_TheHuntsman:
+		case Sniper_m_FestiveHuntsman:
+		case Sniper_m_TheFortifiedCompound: {
+			float charge = (gInts.Globals->curtime - ProjectileWeapon->GetChargeTime());
+			out = { ((fminf(fmaxf(charge, 0.0f), 1.0f) * 800.0f) + 1800.0f), ((fminf(fmaxf(charge, 0.0f), 1.0f) * -0.4f) + 0.5f) };
 			break;
 		}
 	}
@@ -109,7 +153,6 @@ bool Optimal(float x, float y, float v0, float g, float &pitch) {
 		return false;
 
 	pitch = atan((v0 * v0 - sqrt(root)) / (g * x));
-
 	return true;
 }
 
@@ -125,14 +168,13 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 
 	sol.time = dx / (cos(sol.pitch) * v0);
 	sol.yaw = atan2(v.y, v.x);
-
 	return true;
 }
 
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
 {
 	static const float MAX_TIME = 1.0f;
-	static const float TIME_STEP = 1.0f / 256.0f;
+	static const float TIME_STEP = 1.0f / 512.0f;
 
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
 	{

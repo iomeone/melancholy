@@ -127,6 +127,19 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 				continue; //we didn't find a correction, skip this ent
 		}
 
+		//projectile correction
+		CProjectileWeapon ProjectileWep(wep);
+
+		if (ProjectileWep.GetWeaponInfo().speed > 0.0f) {
+			CPredictor Predictor(v.ent_pos, v.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), v.ptr);
+			Solution_t Solution = {};
+
+			if (Solve(v.local_pos, ProjectileWep, Predictor, Solution, v.ptr->IsOnGround()))
+				v.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
+
+			else continue;
+		}
+
 		if (is_melee) {
 			if (InRangeOnly && !Utils::CanMeleeHit(wep, v.ang_to_ent, v.ptr->GetIndex()))
 				continue;
@@ -303,20 +316,6 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
-		CProjectileWeapon ProjectileWep(pLocalWeapon);
-
-		if (ProjectileWep.GetWeaponInfo().speed > 0.0f) {
-			target.ent_pos.z -= 40.0f;
-
-			CPredictor Predictor(target.ent_pos, target.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), target.ptr);
-			Solution_t Solution = {};
-
-			if (Solve(target.local_pos, ProjectileWep, Predictor, Solution, target.ptr->IsOnGround()))
-				target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
-
-			else return;
-		}
-
 		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped())) {
 			SmoothStartTime = gInts.Globals->curtime;
 			SmoothStartAngle = cmd->viewangles;
