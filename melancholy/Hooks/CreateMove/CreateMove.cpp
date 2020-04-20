@@ -14,6 +14,8 @@ bool __fastcall CreateMove::Hook(void *client_mode, int edx, float input_sample_
 
 	if (pLocal)
 	{
+		gLocalInfo.CurrentTargetIndex = -1; //better to do this here
+
 		CBaseCombatWeapon *pLocalWeapon = pLocal->GetActiveWeapon();
 
 		if (pLocalWeapon)

@@ -1,12 +1,14 @@
 #include "ProjectileSolver.h"
 
+//credits to https://github.com/CasualX
+
 //-------------------------------------------------- CProjectileWeapon
 
 CProjectileWeapon::CProjectileWeapon(CBaseCombatWeapon *wep) {
 	ProjectileWeapon = wep;
 }
 
-ProjectileInfo_t CProjectileWeapon::GetWeaponInfo()
+ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 {
 	if (!ProjectileWeapon)
 		return {};
@@ -88,4 +90,70 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo()
 	}
 
 	return out;
+}
+
+Vec3 CProjectileWeapon::GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const { return (target - origin); }
+
+//-------------------------------------------------- CPredictor
+
+Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, const Vec3 &accel, bool on_ground) const {
+	return (on_ground ? (pos + (vel * time)) : (pos  + (vel * time) - accel * time * time * 0.5f));
+}
+
+//-------------------------------------------------- Solver
+
+bool Optimal(float x, float y, float v0, float g, float &pitch) {
+	const float root = v0 * v0 * v0 * v0 - g * (g * x * x + 2.0f * y * v0 * v0);
+
+	if (root < 0.0f)
+		return false;
+
+	pitch = atan((v0 * v0 - sqrt(root)) / (g * x));
+
+	return true;
+}
+
+bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &target, Solution_t &sol) {
+	const auto v	= weapon.GetProjectileFireSetup(origin, target);
+	const float dx	= sqrt(v.x * v.x + v.y * v.y);
+	const float dy	= v.z;
+	const float v0	= weapon.GetWeaponInfo().speed;
+	const float g	= (800.0f * weapon.GetWeaponInfo().gravity);
+
+	if (!Optimal(dx, dy, v0, (g <= 0.0f ? 0.1f : g), sol.pitch))
+		return false;
+
+	sol.time = dx / (cos(sol.pitch) * v0);
+	sol.yaw = atan2(v.y, v.x);
+
+	return true;
+}
+
+bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
+{
+	static const float MAX_TIME = 1.0f;
+	static const float TIME_STEP = 1.0f / 256.0f;
+
+	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
+	{
+		Vec3 target_pos = target.PredictPosition(target_time, target.origin, target.velocity, target.acceleration, on_ground);
+
+		Ray_t ray;
+		ray.Init(target.origin, target_pos);
+		CTraceFilter filter;
+		filter.pSkip = target.ptr;
+		CGameTrace trace;
+		gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
+
+		if (!trace.endpos.IsZero())
+			target_pos = trace.endpos;
+
+		if (!Solve2D(origin, weapon, target_pos, sol))
+			return false;
+
+		if (sol.time < target_time)
+			return true;
+	}
+
+	return false;
 }

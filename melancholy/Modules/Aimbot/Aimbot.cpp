@@ -3,8 +3,9 @@
 //this entire thing is aimed to be used on players, buildings were in mind at some point in development but I scratched them
 //shouldn't be too hard to put 'em in
 
-Vec3 SmoothStartAngle = Vec3();
-float SmoothStartTime = 0.0f;
+Vec3 SmoothStartAngle	= Vec3();
+float SmoothStartTime	= 0.0f;
+bool EasingDone			= false;
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -187,6 +188,7 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 		float ease = Math::ExponentialEaseOut(time);
 		cmd->viewangles += (delta * ease);
 		gInts.Engine->SetViewAngles(cmd->viewangles);
+		EasingDone = (time > 0.99f);
 	}
 
 	else
@@ -208,33 +210,36 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 	int wep_idx		= wep->GetItemDefinitionIndex();
 	int class_num	= pLocal->GetClassNum();
 
-	if (AimTime > 0.0f) {
-		//you can check the easing == 1 for this but it's not good
-		Vec3 vForward = Vec3();
-		Math::AngleVectors(cmd->viewangles, &vForward);
-		Vec3 vTraceStart = target.local_pos;
-		Vec3 vTraceEnd = (vTraceStart + (vForward * 9999.0f));
+	if (AimTime > 0.0f)
+	{
+		if (!EasingDone)
+		{
+			Vec3 vForward = Vec3();
+			Math::AngleVectors(cmd->viewangles, &vForward);
+			Vec3 vTraceStart = target.local_pos;
+			Vec3 vTraceEnd = (vTraceStart + (vForward * 9999.0f));
 
-		Ray_t ray;
-		ray.Init(vTraceStart, vTraceEnd);
-		CTraceFilter filter;
-		filter.pSkip = pLocal;
-		CGameTrace trace;
-		gInts.EngineTrace->TraceRay(ray, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
+			Ray_t ray;
+			ray.Init(vTraceStart, vTraceEnd);
+			CTraceFilter filter;
+			filter.pSkip = pLocal;
+			CGameTrace trace;
+			gInts.EngineTrace->TraceRay(ray, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
 
-		static float timer = gInts.Globals->curtime;
+			static float timer = gInts.Globals->curtime;
 
-		if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex()) {
-			if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
+			if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex()) {
+				if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
+					return false;
+
+				if ((gInts.Globals->curtime - timer) < 0.05f)
+					return false;
+			}
+
+			else {
+				timer = gInts.Globals->curtime;
 				return false;
-
-			if ((gInts.Globals->curtime - timer) < 0.05f)
-				return false;
-		}
-
-		else {
-			timer = gInts.Globals->curtime;
-			return false;
+			}
 		}
 	}
 
@@ -283,8 +288,6 @@ bool CAimbot::TargetChanged() {
 
 void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd)
 {
-	gLocalInfo.CurrentTargetIndex = -1;
-
 	if (!Active 
 		|| !pLocal->IsAlive() 
 		|| pLocal->IsTaunting()
@@ -300,6 +303,20 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
+		CProjectileWeapon ProjectileWep(pLocalWeapon);
+
+		if (ProjectileWep.GetWeaponInfo().speed > 0.0f) {
+			target.ent_pos.z -= 40.0f;
+
+			CPredictor Predictor(target.ent_pos, target.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), target.ptr);
+			Solution_t Solution = {};
+
+			if (Solve(target.local_pos, ProjectileWep, Predictor, Solution, target.ptr->IsOnGround()))
+				target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
+
+			else return;
+		}
+
 		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped())) {
 			SmoothStartTime = gInts.Globals->curtime;
 			SmoothStartAngle = cmd->viewangles;
