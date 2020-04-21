@@ -5,7 +5,7 @@
 
 Vec3 SmoothStartAngle	= Vec3();
 float SmoothStartTime	= 0.0f;
-bool EasingDone			= false;
+bool EasingDone			= false; //used for projectile autoshoot
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -53,80 +53,7 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 	});
 
 	for (auto &v : Targets)
-	{
-		int vis_hitbox = -1;
-		
-		//if the pos is not visible (or if we're aiming at the head but the hitbox is not head) try some corrections
-		if (!Utils::Vis_Pos_IdOut(pLocal, v.ptr, v.local_pos, v.ent_pos, vis_hitbox) || (hitbox == HITBOX_HEAD && vis_hitbox != hitbox)) {
-			Vec3 pre_correction_ang = v.ang_to_ent;
-
-			//multipoint
-			if (hitbox == HITBOX_HEAD)
-			{
-				if (!Multipoint)
-					continue;
-
-				DWORD *model = v.ptr->GetModel();
-				if (!model)
-					continue;
-
-				studiohdr_t *hdr = reinterpret_cast<studiohdr_t *>(gInts.ModelInfo->GetStudioModel(model));
-				if (!hdr)
-					continue;
-
-				matrix3x4 bone_matrix[128];
-				if (!v.ptr->SetupBones(bone_matrix, 128, 0x100, gInts.Globals->curtime))
-					continue;
-
-				mstudiohitboxset_t *set = hdr->GetHitboxSet(v.ptr->GetHitboxSet());
-				if (!set)
-					continue;
-
-				mstudiobbox_t *box = set->pHitbox(HITBOX_HEAD);
-				if (!box)
-					continue;
-
-				Vec3 mins = (box->bbmin * 0.85f); //scale them down a bit for accuraccy reasons
-				Vec3 maxs = (box->bbmax * 0.85f);
-
-				Vec3 points[5] = {
-					Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z), //top center for aim height meme
-					Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)), //sides center:
-					Vec3(mins.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
-					Vec3(((mins.x + maxs.x) * 0.5f), maxs.y, ((mins.z + maxs.z) * 0.5f)),
-					Vec3(((mins.x + maxs.x) * 0.5f), mins.y, ((mins.z + maxs.z) * 0.5f)),
-				};
-
-				Vec3 out[5] = { Vec3() };
-
-				for (int n = 0; n < 5; n++) {
-					Math::VectorTransform(points[n], bone_matrix[box->bone], out[n]);
-					if (Utils::Vis_Pos_Id(pLocal, v.ptr, v.local_pos, out[n], HITBOX_HEAD)) {
-						v.ang_to_ent = Math::CalcAngle(v.local_pos, out[n]); //recalculate
-						break;
-					}
-				}
-			}
-
-			//hitscan
-			else if (hitbox == HITBOX_PELVIS)
-			{
-				if (!Hitscan)
-					continue;
-
-				for (int n = 1; n < v.ptr->GetNumOfHitboxes(); n++) {
-					Vec3 vis_body = v.ptr->GetHitboxPos(n);
-					if (Utils::Vis_Pos(pLocal, v.ptr, v.local_pos, vis_body)) {
-						v.ang_to_ent = Math::CalcAngle(v.local_pos, vis_body); //recalculate
-						break;
-					}
-				}
-			}
-
-			if (v.ang_to_ent.x == pre_correction_ang.x && v.ang_to_ent.y == pre_correction_ang.y)
-				continue; //we didn't find a correction, skip this ent
-		}
-
+	{	
 		//projectile correction
 		CProjectileWeapon ProjectileWep(wep);
 
@@ -134,10 +61,90 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 			CPredictor Predictor(v.ent_pos, v.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), v.ptr);
 			Solution_t Solution = {};
 
-			if (Solve(v.local_pos, ProjectileWep, Predictor, Solution, v.ptr->IsOnGround()))
+			//vis checking is done inside this func
+			if (Solve(v.local_pos, ProjectileWep, Predictor, Solution, v.ptr->IsOnGround())) {
 				v.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
+				v.fov = Math::CalcFov(LocalAngles, v.ang_to_ent); //recalculate
+			}
 
 			else continue;
+		}
+
+		//hitscan correction
+		else
+		{
+			int vis_hitbox = -1;
+
+			//if the pos is not visible (or if we're aiming at the head but the hitbox is not head) try some corrections
+			if (!Utils::Vis_Pos_IdOut(pLocal, v.ptr, v.local_pos, v.ent_pos, vis_hitbox) || (hitbox == HITBOX_HEAD && vis_hitbox != hitbox)) {
+				Vec3 pre_correction_ang = v.ang_to_ent;
+
+				//multipoint
+				if (hitbox == HITBOX_HEAD)
+				{
+					if (!Multipoint)
+						continue;
+
+					DWORD *model = v.ptr->GetModel();
+					if (!model)
+						continue;
+
+					studiohdr_t *hdr = reinterpret_cast<studiohdr_t *>(gInts.ModelInfo->GetStudioModel(model));
+					if (!hdr)
+						continue;
+
+					matrix3x4 bone_matrix[128];
+					if (!v.ptr->SetupBones(bone_matrix, 128, 0x100, gInts.Globals->curtime))
+						continue;
+
+					mstudiohitboxset_t *set = hdr->GetHitboxSet(v.ptr->GetHitboxSet());
+					if (!set)
+						continue;
+
+					mstudiobbox_t *box = set->pHitbox(HITBOX_HEAD);
+					if (!box)
+						continue;
+
+					Vec3 mins = (box->bbmin * 0.85f); //scale them down a bit for accuraccy reasons
+					Vec3 maxs = (box->bbmax * 0.85f);
+
+					Vec3 points[5] = {
+						Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z), //top center for aim height meme
+						Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)), //sides center:
+						Vec3(mins.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
+						Vec3(((mins.x + maxs.x) * 0.5f), maxs.y, ((mins.z + maxs.z) * 0.5f)),
+						Vec3(((mins.x + maxs.x) * 0.5f), mins.y, ((mins.z + maxs.z) * 0.5f)),
+					};
+
+					Vec3 out[5] = { Vec3() };
+
+					for (int n = 0; n < 5; n++) {
+						Math::VectorTransform(points[n], bone_matrix[box->bone], out[n]);
+						if (Utils::Vis_Pos_Id(pLocal, v.ptr, v.local_pos, out[n], HITBOX_HEAD)) {
+							v.ang_to_ent = Math::CalcAngle(v.local_pos, out[n]); //recalculate
+							break;
+						}
+					}
+				}
+
+				//hitscan
+				else if (hitbox == HITBOX_PELVIS)
+				{
+					if (!Hitscan)
+						continue;
+
+					for (int n = 1; n < v.ptr->GetNumOfHitboxes(); n++) {
+						Vec3 vis_body = v.ptr->GetHitboxPos(n);
+						if (Utils::Vis_Pos(pLocal, v.ptr, v.local_pos, vis_body)) {
+							v.ang_to_ent = Math::CalcAngle(v.local_pos, vis_body); //recalculate
+							break;
+						}
+					}
+				}
+
+				if (v.ang_to_ent.x == pre_correction_ang.x && v.ang_to_ent.y == pre_correction_ang.y)
+					continue; //we didn't find a correction, skip this ent
+			}
 		}
 
 		if (is_melee) {
@@ -145,7 +152,7 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 				continue;
 			
 			if (AimAtClosest)
-				return v; //remember these are sorted already!
+				return v; //these are sorted already!
 		}
 
 		if (v.fov < AimFov)
@@ -225,6 +232,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 
 	if (AimTime > 0.0f)
 	{
+		//this is basically a triggerbot x)
 		if (!EasingDone)
 		{
 			Vec3 vForward = Vec3();
@@ -317,12 +325,15 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 	if (target.ptr)
 	{
 		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped())) {
-			SmoothStartTime = gInts.Globals->curtime;
-			SmoothStartAngle = cmd->viewangles;
-			return;
+			int wep_idx = pLocalWeapon->GetItemDefinitionIndex();
+			if (wep_idx != Sniper_m_TheHuntsman && wep_idx != Sniper_m_FestiveHuntsman && wep_idx != Sniper_m_TheFortifiedCompound) {
+				SmoothStartTime = gInts.Globals->curtime;
+				SmoothStartAngle = cmd->viewangles;
+				return;
+			}
 		}
 
-		if (IsAimKeyDown()) 
+		if (IsAimKeyDown())
 		{
 			gLocalInfo.CurrentTargetIndex = target.ptr->GetIndex();
 

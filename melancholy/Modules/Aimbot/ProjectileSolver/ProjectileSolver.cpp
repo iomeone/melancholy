@@ -1,6 +1,6 @@
 #include "ProjectileSolver.h"
 
-//credits to https://github.com/CasualX
+//credits to https://github.com/CasualX for the 3 solving funcs
 
 //-------------------------------------------------- CProjectileWeapon
 
@@ -136,11 +136,14 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 	return out;
 }
 
-Vec3 CProjectileWeapon::GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const { return (target - origin); }
+Vec3 CProjectileWeapon::GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const {
+	return (target - origin); 
+}
 
 //-------------------------------------------------- CPredictor
 
 Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, const Vec3 &accel, bool on_ground) const {
+	//use linear pred if the target is on ground
 	return (on_ground ? (pos + (vel * time)) : (pos  + (vel * time) - accel * time * time * 0.5f));
 }
 
@@ -174,27 +177,39 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
 {
 	static const float MAX_TIME = 1.0f;
-	static const float TIME_STEP = 1.0f / 512.0f;
+	static const float TIME_STEP = 1.0f / 512.0f; //Idk how many cycles I should do here
 
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
 	{
-		Vec3 target_pos = target.PredictPosition(target_time, target.origin, target.velocity, target.acceleration, on_ground);
+		Vec3 predicted_pos = target.PredictPosition(target_time, target.origin, target.velocity, target.acceleration, on_ground);
 
-		Ray_t ray;
-		ray.Init(target.origin, target_pos);
-		CTraceFilter filter;
-		filter.pSkip = target.ptr;
-		CGameTrace trace;
-		gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
+		{
+			Ray_t ray;
+			ray.Init(target.origin, predicted_pos);
+			CTraceFilter filter;
+			filter.pSkip = target.ptr;
+			CGameTrace trace;
+			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
+			predicted_pos = trace.endpos;
+		}
 
-		if (!trace.endpos.IsZero())
-			target_pos = trace.endpos;
-
-		if (!Solve2D(origin, weapon, target_pos, sol))
+		if (!Solve2D(origin, weapon, predicted_pos, sol))
 			return false;
 
 		if (sol.time < target_time)
+		{
+			Ray_t ray;
+			ray.Init(predicted_pos, origin);
+			CTraceFilter filter;
+			filter.pSkip = target.ptr;
+			CGameTrace trace;
+			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
+
+			if (trace.fraction < 0.99f)
+				return false;
+
 			return true;
+		}
 	}
 
 	return false;

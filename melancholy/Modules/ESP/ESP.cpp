@@ -180,7 +180,7 @@ void CESP::Run()
 		}
 	}
 
-	if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible())
+	if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
@@ -188,45 +188,51 @@ void CESP::Run()
 	if (!pLocal)
 		return;
 
-	//spectators
-	if (SpectatorList)
+	if (pLocal->IsAlive())
 	{
+		if (SpectatorList)
+		{
+			if (!Spectators.empty())
+				Spectators.clear();
+
+			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
+			{
+				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
+
+				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive())
+					continue;
+
+				PlayerInfo_t info;
+
+				if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &info))
+					continue;
+
+				CBaseEntity *obs_target = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
+
+				if (!obs_target || obs_target != pLocal || !obs_target->IsAlive())
+					continue;
+
+				auto GetMode = [&](CBaseEntity *ent) -> std::string {
+					switch (ent->GetObserverMode()) {
+						case OBS_MODE_FIRSTPERSON: { return "firstperson"; }
+						case OBS_MODE_THIRDPERSON: { return "thirdperson"; }
+						default: return "BOO!";
+					}
+				};
+
+				std::string mode = GetMode(ent);
+
+				if (mode == "BOO!")
+					continue;
+
+				Spectators.push_back({ info.name, mode });
+			}
+		}
+	}
+
+	else {
 		if (!Spectators.empty())
 			Spectators.clear();
-
-		for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
-		{
-			CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
-
-			if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive())
-				continue;
-
-			PlayerInfo_t info;
-
-			if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &info))
-				continue;
-
-			CBaseEntity *observed = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
-
-			if (!observed || observed != pLocal || !observed->IsAlive())
-				continue;
-
-			auto GetMode = [&](CBaseEntity *ent) -> std::string {
-				switch (ent->GetObserverMode())
-				{
-					case OBS_MODE_FIRSTPERSON: { return "firstperson"; }
-					case OBS_MODE_THIRDPERSON: { return "thirdperson"; }
-					default: return "BOO!";
-				}
-			};
-
-			std::string mode = GetMode(ent);
-
-			if (mode == "BOO!")
-				continue;
-
-			Spectators.push_back({ info.name, mode });
-		}
 	}
 	
 	if (GetEntities(pLocal))

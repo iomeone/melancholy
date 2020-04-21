@@ -156,6 +156,9 @@
     <Filter Include="Header Files\Hooks\OnScreenSizeChanged">
       <UniqueIdentifier>{73cc828f-83e0-4a6c-957f-04b2fc3f7b93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\IEngineVGui">
+      <UniqueIdentifier>{3be2b125-48f3-4414-92a2-0a715dd2d3ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -295,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.cpp">
       <Filter>Header Files\Hooks\OnScreenSizeChanged</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\IEngineVGui\IEngineVGui.cpp">
+      <Filter>Header Files\SDK\Interfaces\IEngineVGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -468,6 +474,9 @@
     </ClInclude>
     <ClInclude Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.h">
       <Filter>Header Files\Hooks\OnScreenSizeChanged</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\IEngineVGui\IEngineVGui.h">
+      <Filter>Header Files\SDK\Interfaces\IEngineVGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

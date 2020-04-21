@@ -18,8 +18,7 @@ bool __fastcall CreateMove::Hook(void *client_mode, int edx, float input_sample_
 
 		CBaseCombatWeapon *pLocalWeapon = pLocal->GetActiveWeapon();
 
-		if (pLocalWeapon)
-		{
+		if (pLocalWeapon) {
 			gMisc.Run(pLocal, cmd);
 			gLocalInfo.CanHeadShot = pLocalWeapon->CanWeaponHeadShot();
 			Utils::LocalPrediction(pLocal, cmd);

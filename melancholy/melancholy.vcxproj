@@ -187,6 +187,7 @@
     <ClCompile Include="SDK\Interfaces\CModelInfo\CModelInfo.cpp" />
     <ClCompile Include="SDK\Interfaces\CModelRender\CModelRender.cpp" />
     <ClCompile Include="SDK\Interfaces\IEngineTrace\IEngineTrace.cpp" />
+    <ClCompile Include="SDK\Interfaces\IEngineVGui\IEngineVGui.cpp" />
     <ClCompile Include="SDK\Interfaces\IMaterialSystem\IMaterialSystem.cpp" />
     <ClCompile Include="SDK\Interfaces\IMoveHelper\IMoveHelper.cpp" />
     <ClCompile Include="SDK\Interfaces\Interfaces.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="SDK\Interfaces\CModelRender\CModelRender.h" />
     <ClInclude Include="SDK\Interfaces\CRenderView\CRenderView.h" />
     <ClInclude Include="SDK\Interfaces\IEngineTrace\IEngineTrace.h" />
+    <ClInclude Include="SDK\Interfaces\IEngineVGui\IEngineVGui.h" />
     <ClInclude Include="SDK\Interfaces\IGameMovement\IGameMovement.h" />
     <ClInclude Include="SDK\Interfaces\IMaterialSystem\IMaterialSystem.h" />
     <ClInclude Include="SDK\Interfaces\IMaterial\IMaterial.h" />

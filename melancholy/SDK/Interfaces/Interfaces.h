@@ -13,7 +13,7 @@
 #include "IMaterialSystem/IMaterialSystem.h"
 #include "CModelRender/CModelRender.h"
 #include "CRenderView/CRenderView.h"
-
+#include "IEngineVGui/IEngineVGui.h"
 
 struct Interfaces_t
 {
@@ -32,6 +32,7 @@ struct Interfaces_t
 	IMaterialSystem *MatSystem		= nullptr;
 	CModelRender *ModelRender		= nullptr;
 	CRenderView *RenderView			= nullptr;
+	IEngineVGui *EngineVGui			= nullptr;
 
 	DWORD DXDevice = 0x0;
 

@@ -16,8 +16,8 @@ void Interfaces_t::Initialize()
 	MatSystem		= reinterpret_cast<IMaterialSystem*>		(gInterface.Get("MaterialSystem.dll", "VMaterialSystem081"));
 	ModelRender		= reinterpret_cast<CModelRender*>			(gInterface.Get("engine.dll", "VEngineModel016"));
 	RenderView		= reinterpret_cast<CRenderView*>			(gInterface.Get("engine.dll", "VEngineRenderView014"));
-
-	DXDevice = **reinterpret_cast<DWORD **>(gPattern.FindInModule("shaderapidx9.dll", "A1 ?? ?? ?? ?? 50 8B 08 FF 51 0C") + 0x1);
+	EngineVGui		= reinterpret_cast<IEngineVGui*>			(gInterface.Get("engine.dll", "VEngineVGui001"));
+	DXDevice		= **reinterpret_cast<DWORD **>				(gPattern.FindInModule("shaderapidx9.dll", "A1 ?? ?? ?? ?? 50 8B 08 FF 51 0C") + 0x1);
 }
 
 Interfaces_t gInts;
