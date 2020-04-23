@@ -13,7 +13,6 @@ private:
 public:
 	CProjectileWeapon(CBaseCombatWeapon *wep);
 	ProjectileInfo_t GetWeaponInfo() const;
-	Vec3 GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const;
 };
 
 class CPredictor {
@@ -33,5 +32,10 @@ struct Solution_t {
 	float yaw = 0.0f;
 	float time = 0.0f;
 };
+
+struct PredOut_t {
+	Vec3 pred_pos = Vec3();
+	Vec3 non_pred_pos = Vec3();
+}; extern PredOut_t gPredOut;
 
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground);

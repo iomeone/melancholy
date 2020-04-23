@@ -30,7 +30,7 @@ public:
 	bool WaitForHS		= true;
 	bool ScopedOnly		= true;
 	int AimKey			= 0; //0 lshift 1 lbutton
-	float AimFov		= 180.0f;
+	float AimFov		= 45.0f;
 	float AimTime		= 0.0f;
 
 	//melee

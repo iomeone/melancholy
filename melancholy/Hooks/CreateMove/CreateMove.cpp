@@ -14,7 +14,9 @@ bool __fastcall CreateMove::Hook(void *client_mode, int edx, float input_sample_
 
 	if (pLocal)
 	{
-		gLocalInfo.CurrentTargetIndex = -1; //better to do this here
+		gLocalInfo.CurrentTargetIndex	= -1; //better to do this here
+		gPredOut.pred_pos				= Vec3();
+		gPredOut.non_pred_pos			= Vec3();
 
 		CBaseCombatWeapon *pLocalWeapon = pLocal->GetActiveWeapon();
 

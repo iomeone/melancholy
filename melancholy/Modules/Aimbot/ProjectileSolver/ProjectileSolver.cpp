@@ -1,6 +1,6 @@
 #include "ProjectileSolver.h"
 
-//credits to https://github.com/CasualX for the 3 solving funcs
+//credits to Casual_Hacker
 
 //-------------------------------------------------- CProjectileWeapon
 
@@ -136,10 +136,6 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 	return out;
 }
 
-Vec3 CProjectileWeapon::GetProjectileFireSetup(const Vec3 &origin, const Vec3 &target) const {
-	return (target - origin); 
-}
-
 //-------------------------------------------------- CPredictor
 
 Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, const Vec3 &accel, bool on_ground) const {
@@ -152,7 +148,7 @@ Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, c
 bool Optimal(float x, float y, float v0, float g, float &pitch) {
 	const float root = v0 * v0 * v0 * v0 - g * (g * x * x + 2.0f * y * v0 * v0);
 
-	if (root < 0.0f)
+	if (root < 0.0f) //if it's negative there are no solutions
 		return false;
 
 	pitch = atan((v0 * v0 - sqrt(root)) / (g * x));
@@ -160,17 +156,21 @@ bool Optimal(float x, float y, float v0, float g, float &pitch) {
 }
 
 bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &target, Solution_t &sol) {
-	const auto v	= weapon.GetProjectileFireSetup(origin, target);
+	const Vec3 v	= (target - origin);
 	const float dx	= sqrt(v.x * v.x + v.y * v.y);
 	const float dy	= v.z;
 	const float v0	= weapon.GetWeaponInfo().speed;
 	const float g	= (800.0f * weapon.GetWeaponInfo().gravity);
 
-	if (!Optimal(dx, dy, v0, (g <= 0.0f ? 0.1f : g), sol.pitch))
-		return false;
+	if (g > 0.0f) {
+		if (!Optimal(dx, dy, v0, g, sol.pitch))
+			return false;
+	}
+	
+	else sol.pitch = -DEG2RAD(Math::CalcAngle(origin, target).x); //Pepega
 
-	sol.time = dx / (cos(sol.pitch) * v0);
 	sol.yaw = atan2(v.y, v.x);
+	sol.time = dx / (cos(sol.pitch) * v0);
 	return true;
 }
 
@@ -196,8 +196,7 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 		if (!Solve2D(origin, weapon, predicted_pos, sol))
 			return false;
 
-		if (sol.time < target_time)
-		{
+		if (sol.time < target_time) {
 			Ray_t ray;
 			ray.Init(predicted_pos, origin);
 			CTraceFilter filter;
@@ -208,9 +207,14 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 			if (trace.fraction < 0.99f)
 				return false;
 
+			gPredOut.pred_pos = predicted_pos;
+			gPredOut.non_pred_pos = target.origin;
+
 			return true;
 		}
 	}
 
 	return false;
 }
+
+PredOut_t gPredOut;

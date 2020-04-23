@@ -180,7 +180,7 @@ void CESP::Run()
 		}
 	}
 
-	if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
+	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
@@ -188,13 +188,25 @@ void CESP::Run()
 	if (!pLocal)
 		return;
 
+	if (pLocal->IsAlive()) {
+		if (!gPredOut.pred_pos.IsZero()) {
+			Vec3 pred_scrn = Vec3(), non_pred_scrn = Vec3();
+			if (Math::W2S(gPredOut.pred_pos, pred_scrn) && Math::W2S(gPredOut.non_pred_pos, non_pred_scrn)) {
+				Draw.Line(non_pred_scrn.x, non_pred_scrn.y, pred_scrn.x, pred_scrn.y, ColGreen);
+			}
+		}
+	}
+
+	if (!Active)
+		return;
+
+	if (!Spectators.empty())
+		Spectators.clear();
+
 	if (pLocal->IsAlive())
 	{
 		if (SpectatorList)
 		{
-			if (!Spectators.empty())
-				Spectators.clear();
-
 			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
 			{
 				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
@@ -228,11 +240,6 @@ void CESP::Run()
 				Spectators.push_back({ info.name, mode });
 			}
 		}
-	}
-
-	else {
-		if (!Spectators.empty())
-			Spectators.clear();
 	}
 	
 	if (GetEntities(pLocal))
