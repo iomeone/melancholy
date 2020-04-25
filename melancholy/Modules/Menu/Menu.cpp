@@ -446,11 +446,17 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 		}
 	}
 
-	if (gESP.SpectatorList && gESP.Active && gInts.Engine->IsInGame() && gInts.Engine->IsConnected() && !gInts.Engine->Con_IsVisible())
+	if (gESP.SpectatorList 
+		&& gESP.Active
+		&& gInts.Engine->IsInGame()
+		&& gInts.Engine->IsConnected()
+		&& !gInts.Engine->Con_IsVisible()
+		&& !gInts.EngineVGui->IsGameUIVisible())
 	{
-		if (ImGui::Begin("spectators", nullptr, windowFlags))
+		std::string title = std::string("spectators (" + std::to_string(gESP.Spectators.size()) + ")###");
+		if (ImGui::Begin(title.c_str(), nullptr, windowFlags)) //I just messed around until this whole thing worked xd
 		{
-			ImGui::SetWindowSize(ImVec2(200.0f, (45.0f + ((ImGui::GetFontSize() + 5.0f) * gESP.Spectators.size()))));
+			ImGui::SetWindowSize(ImVec2(200.0f, (44.0f + ((ImGui::GetFontSize() + 5.0f) * gESP.Spectators.size()))));
 			ImGui::Columns(2);
 
 			ImGui::Text("name");

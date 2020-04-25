@@ -188,8 +188,8 @@ void CESP::Run()
 	if (!pLocal)
 		return;
 
-	if (pLocal->IsAlive())
-	{
+	//outside active check to visualize it even if ESP is disabled
+	if (pLocal->IsAlive()) {
 		if (!gPredOut.pred_pos.IsZero()) {
 			Vec3 pred_scrn = Vec3(), non_pred_scrn = Vec3();
 
@@ -201,18 +201,18 @@ void CESP::Run()
 	if (!Active)
 		return;
 
-	if (!Spectators.empty())
-		Spectators.clear();
-
-	if (pLocal->IsAlive())
+	if (SpectatorList)
 	{
-		if (SpectatorList)
+		if (!Spectators.empty())
+			Spectators.clear();
+
+		if (pLocal->IsAlive())
 		{
 			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
 			{
 				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
 
-				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive())
+				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
 					continue;
 
 				PlayerInfo_t info;
@@ -227,18 +227,20 @@ void CESP::Run()
 
 				auto GetMode = [&](CBaseEntity *ent) -> std::string {
 					switch (ent->GetObserverMode()) {
-						case OBS_MODE_FIRSTPERSON: { return "firstperson"; }
-						case OBS_MODE_THIRDPERSON: { return "thirdperson"; }
-						default: return "BOO!";
+						case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
+						case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
+						default: return std::string();
 					}
 				};
 
 				std::string mode = GetMode(ent);
 
-				if (mode == "BOO!")
+				if (mode.empty())
 					continue;
 
 				Spectators.push_back({ info.name, mode });
+
+				//drawing is in Menu.cpp
 			}
 		}
 	}
@@ -253,7 +255,7 @@ void CESP::Run()
 				continue;
 			
 			static int healthbar_size	= 3;
-			static int healthbar_offset = 2; //if vertically - otherwise +
+			static int healthbar_offset = 2;
 			int text_x					= ((x + w) + 2);
 			int text_y					= y;
 			int text_offset				= 0; //updated after each text draw
