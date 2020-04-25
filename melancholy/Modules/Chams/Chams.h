@@ -17,6 +17,8 @@ public:
 	int PlayerChams			= 0; //0 off 1 shaded 2 flat
 	int PlayerChamsMode		= 1; //0 visible 1 invisible 2 always
 	bool NoTeammatePlayers	= true;
+	bool PlayerCosmetics	= false;
+	bool PlayerWeapons		= false;
 
 	int BuildingChams			= 0;
 	int BuildingChamsMode		= 1;

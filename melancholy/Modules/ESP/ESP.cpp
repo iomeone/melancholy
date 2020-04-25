@@ -188,12 +188,13 @@ void CESP::Run()
 	if (!pLocal)
 		return;
 
-	if (pLocal->IsAlive()) {
+	if (pLocal->IsAlive())
+	{
 		if (!gPredOut.pred_pos.IsZero()) {
 			Vec3 pred_scrn = Vec3(), non_pred_scrn = Vec3();
-			if (Math::W2S(gPredOut.pred_pos, pred_scrn) && Math::W2S(gPredOut.non_pred_pos, non_pred_scrn)) {
+
+			if (Math::W2S(gPredOut.pred_pos, pred_scrn) && Math::W2S(gPredOut.non_pred_pos, non_pred_scrn))
 				Draw.Line(non_pred_scrn.x, non_pred_scrn.y, pred_scrn.x, pred_scrn.y, ColGreen);
-			}
 		}
 	}
 

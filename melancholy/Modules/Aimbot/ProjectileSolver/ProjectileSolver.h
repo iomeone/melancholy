@@ -2,8 +2,9 @@
 #include "../../../SDK/SDK.h"
 
 struct ProjectileInfo_t {
-	float speed = 0.0f;
-	float gravity = 0.0f;
+	float speed		= 0.0f;
+	float gravity	= 0.0f;
+	bool is_pipe	= false;
 };
 
 class CProjectileWeapon {
@@ -19,11 +20,11 @@ class CPredictor {
 public:
 	Vec3 origin			= Vec3();
 	Vec3 velocity		= Vec3();
-	Vec3 acceleration	= Vec3();
+	Vec3 gravity		= Vec3();
 	CBaseEntity *ptr	= nullptr;
 
 public:
-	inline CPredictor(Vec3 origin, Vec3 velocity, Vec3 acceleration, CBaseEntity *ptr) : origin(origin), velocity(velocity), acceleration(acceleration), ptr(ptr){}
+	inline CPredictor(Vec3 origin, Vec3 velocity, Vec3 acceleration, CBaseEntity *ptr) : origin(origin), velocity(velocity), gravity(acceleration), ptr(ptr){}
 	Vec3 PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, const Vec3 &accel, bool on_ground) const;
 };
 

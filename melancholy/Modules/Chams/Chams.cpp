@@ -93,10 +93,12 @@ void CChams::Run()
 
 				cham(ent, mat, col, mode);
 
-				CBaseCombatWeapon *weapon = ent->GetActiveWeapon();
+				if (PlayerWeapons) {
+					CBaseCombatWeapon *weapon = ent->GetActiveWeapon();
 
-				if (weapon)
-					cham(weapon, mat, gESP.ColWhite, mode);
+					if (weapon)
+						cham(weapon, mat, gESP.ColWhite, mode);
+				}
 			}
 		}
 
@@ -144,7 +146,7 @@ void CChams::Run()
 
 			RGBA_t col = Utils::GetTeamColor(owner->GetTeamNum());
 
-			if (PlayerChams && (NoTeammatePlayers ? owner->GetTeamNum() != pLocal->GetTeamNum() : true))
+			if (PlayerChams && (NoTeammatePlayers ? owner->GetTeamNum() != pLocal->GetTeamNum() : true) && PlayerCosmetics)
 			{
 				IMaterial *mat = (PlayerChams < 2 ? gMatHelper.shaded : gMatHelper.flat);
 				ChamMode_t mode = ChamMode_t::DEFAULT;

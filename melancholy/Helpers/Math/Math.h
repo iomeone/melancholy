@@ -217,6 +217,21 @@ namespace Math
 		_asm ret 8
 	}
 
+	inline void SinCos(float radians, float *sine, float *cosine)
+	{
+		_asm
+		{
+			fld		DWORD PTR[radians]
+			fsincos
+
+			mov edx, DWORD PTR[cosine]
+			mov eax, DWORD PTR[sine]
+
+			fstp DWORD PTR[edx]
+			fstp DWORD PTR[eax]
+		}
+	}
+
 	inline void VectorAngles(Vec3 &vForward, Vec3 &vAngles)
 	{
 		float tmp, yaw, pitch;
@@ -276,24 +291,35 @@ namespace Math
 		forward->z = -sp;
 	}
 
+	inline void AngleVectors(const Vec3 &angles, Vec3 *forward, Vec3 *right, Vec3 *up) 
+	{
+		float sr, sp, sy, cr, cp, cy;
+		SinCos(DEG2RAD(angles.x), &sp, &cp);
+		SinCos(DEG2RAD(angles.y), &sy, &cy);
+		SinCos(DEG2RAD(angles.z), &sr, &cr);
+
+		if (forward) {
+			forward->x = cp * cy;
+			forward->y = cp * sy;
+			forward->z = -sp;
+		}
+
+		if (right) {
+			right->x = (-1 * sr * sp * cy + -1 * cr * -sy);
+			right->y = (-1 * sr * sp * sy + -1 * cr * cy);
+			right->z = -1 * sr * cp;
+		}
+
+		if (up) {
+			up->x = (cr * sp * cy + -sr * -sy);
+			up->y = (cr * sp * sy + -sr * cy);
+			up->z = cr * cp;
+		}
+	}
+
 	inline float DotProduct(const float *v1, const float *v2)
 	{
 		return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
-	}
-
-	inline void SinCos(float radians, float *sine, float *cosine)
-	{
-		_asm
-		{
-			fld		DWORD PTR[radians]
-			fsincos
-
-			mov edx, DWORD PTR[cosine]
-			mov eax, DWORD PTR[sine]
-
-			fstp DWORD PTR[edx]
-			fstp DWORD PTR[eax]
-		}
 	}
 
 	inline void VectorTransform(const Vec3 &vSome, const matrix3x4 &vMatrix, Vec3 &vOut)

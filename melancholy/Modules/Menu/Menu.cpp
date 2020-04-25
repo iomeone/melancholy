@@ -360,6 +360,8 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
 						ImGui::Checkbox("no teammates", &gChams.NoTeammatePlayers);
+						ImGui::Checkbox("cosmetics",	&gChams.PlayerCosmetics);
+						ImGui::Checkbox("weapons",		&gChams.PlayerWeapons);
 
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();
