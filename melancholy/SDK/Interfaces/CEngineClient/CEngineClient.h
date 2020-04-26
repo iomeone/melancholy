@@ -18,6 +18,7 @@ public:
 	bool IsDrawingLoadingImage(void);
 	const matrix3x4 &WorldToScreenMatrix(void);
 	bool IsTakingScreenshot(void);
+	bool IsHLTV();
 	DWORD *GetNetChannelInfo(void);
 	void ClientCmd_Unrestricted(const char *szCommandString);
 };

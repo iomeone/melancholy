@@ -14,9 +14,9 @@
 #include "CModelRender/CModelRender.h"
 #include "CRenderView/CRenderView.h"
 #include "IEngineVGui/IEngineVGui.h"
+#include "CGlowObjectManager/CGlowObjectManager.h"
 
-struct Interfaces_t
-{
+struct Interfaces_t {
 	CEngineClient *Engine			= nullptr;
 	CEntityList *EntityList			= nullptr;
 	CGlobals *Globals				= nullptr;
@@ -33,6 +33,7 @@ struct Interfaces_t
 	CModelRender *ModelRender		= nullptr;
 	CRenderView *RenderView			= nullptr;
 	IEngineVGui *EngineVGui			= nullptr;
+	CGlowObjectManager *GlowObject	= nullptr;
 
 	DWORD DXDevice = 0x0;
 

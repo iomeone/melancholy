@@ -5,6 +5,7 @@
 #include "../ESP/ESP.h"
 #include "../Chams/Chams.h"
 #include "../Misc/Misc.h"
+#include "../Glow/Glow.h"
 
 class CMenu
 {

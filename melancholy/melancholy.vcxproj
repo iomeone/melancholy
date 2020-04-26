@@ -151,7 +151,6 @@
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="DynamicNetvars\DynamicNetvars.cpp" />
     <ClCompile Include="Helpers\Color\Color.cpp" />
-    <ClCompile Include="Helpers\Input\Input.cpp" />
     <ClCompile Include="Helpers\Interface\Interface.cpp" />
     <ClCompile Include="Helpers\Pattern\Pattern.cpp" />
     <ClCompile Include="Helpers\VMTHooks\VMTHooks.cpp" />
@@ -178,6 +177,7 @@
     <ClCompile Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.cpp" />
     <ClCompile Include="Modules\Chams\Chams.cpp" />
     <ClCompile Include="Modules\ESP\ESP.cpp" />
+    <ClCompile Include="Modules\Glow\Glow.cpp" />
     <ClCompile Include="Modules\Menu\Menu.cpp" />
     <ClCompile Include="Modules\Misc\Misc.cpp" />
     <ClCompile Include="SDK\Interfaces\CClientModeShared\CClientModeShared.cpp" />
@@ -203,10 +203,10 @@
     <ClInclude Include="Helpers\Color\Color.h" />
     <ClInclude Include="Helpers\GetVirtual\GetVirtual.h" />
     <ClInclude Include="Helpers\Helpers.h" />
-    <ClInclude Include="Helpers\Input\Input.h" />
     <ClInclude Include="Helpers\Interface\Interface.h" />
     <ClInclude Include="Helpers\Math\Math.h" />
     <ClInclude Include="Helpers\Pattern\Pattern.h" />
+    <ClInclude Include="Helpers\UtlVector\UtlVector.h" />
     <ClInclude Include="Helpers\VMTHooks\VMTHooks.h" />
     <ClInclude Include="Hooks\CreateMove\CreateMove.h" />
     <ClInclude Include="Hooks\DirectX\DirectX.h" />
@@ -233,6 +233,7 @@
     <ClInclude Include="Modules\Aimbot\ProjectileSolver\ProjectileSolver.h" />
     <ClInclude Include="Modules\Chams\Chams.h" />
     <ClInclude Include="Modules\ESP\ESP.h" />
+    <ClInclude Include="Modules\Glow\Glow.h" />
     <ClInclude Include="Modules\Menu\Menu.h" />
     <ClInclude Include="Modules\Misc\Misc.h" />
     <ClInclude Include="SDK\Defines.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="SDK\Interfaces\CEngineClient\CEngineClient.h" />
     <ClInclude Include="SDK\Interfaces\CEntityList\CEntityList.h" />
     <ClInclude Include="SDK\Interfaces\CGlobals\CGlobals.h" />
+    <ClInclude Include="SDK\Interfaces\CGlowObjectManager\CGlowObjectManager.h" />
     <ClInclude Include="SDK\Interfaces\CHLClient\CHLClient.h" />
     <ClInclude Include="SDK\Interfaces\CModelInfo\CModelInfo.h" />
     <ClInclude Include="SDK\Interfaces\CModelRender\CModelRender.h" />

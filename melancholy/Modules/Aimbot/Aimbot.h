@@ -25,13 +25,18 @@ private:
 public:
 	//main
 	bool Active			= false;
+	bool ProjectileAim	= false;
 	bool Silent			= false;
 	bool Autoshoot		= false;
-	bool WaitForHS		= true;
-	bool ScopedOnly		= true;
 	int AimKey			= 0; //0 lshift 1 lbutton
 	float AimFov		= 45.0f;
 	float AimTime		= 0.0f;
+
+	//hitscan
+	bool WaitForHS	= true;
+	bool ScopedOnly = false;
+	bool Multipoint = false;
+	bool Hitscan	= false;
 
 	//melee
 	bool AimMelee		= true;
@@ -41,12 +46,9 @@ public:
 
 	//players
 	int AimHitbox			= 2; //0 head 1 body 2 auto
-	bool HighlightTarget	= true;
 	bool IgnoreCloaked		= false;
 	bool IgnoreTaunting		= true;
-	bool RemoveDisguise		= true;
-	bool Multipoint			= false;
-	bool Hitscan			= false;
+	bool RemoveDisguise		= false;
 
 	void Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd);
 };

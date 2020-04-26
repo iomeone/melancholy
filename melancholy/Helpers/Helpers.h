@@ -4,7 +4,7 @@
 #include "GetVirtual/GetVirtual.h"
 #include "VMTHooks/VMTHooks.h"
 #include "Pattern/Pattern.h"
-#include "Input/Input.h"
+#include "UtlVector/UtlVector.h"
 
 #include <string>
 #include <d3d9.h>

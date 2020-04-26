@@ -73,6 +73,16 @@ public:
 	int GetObserverTarget();
 	int GetObserverMode();
 	void RemoveEffect(EffectFlags_t Effect);
+
+	//Glow stuff
+
+	void SetGlowEnabled(bool bState);
+	bool IsGlowEnabled();
+	bool HasGlowEffect(int &GlowObjectIdx);
+	int RegisterGlowObject(Vec3 &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded, int nSplitScreenSlot);
+	int RegisterGlow(Vec3 &vGlowColor, float fAlpha);
+	void UnregisterGlow();
+	void UpdateGlowEffect();
 };
 
 class CObject : public CBaseEntity
@@ -176,7 +186,7 @@ public:
 	void Initialize();
 	IMaterial *CreateMaterial(bool ignorez, bool flat, bool wireframe, bool add_shine);
 	void ResetMaterial();
-	void ForceMaterial(IMaterial *material, RGBA_t &color);
+	void ForceMaterial(IMaterial *material, RGBA_t &color, float alpha_override = 1.0f);
 };
 
 extern MatHelper_t gMatHelper;
@@ -190,10 +200,8 @@ struct LocalInfo_t {
 extern LocalInfo_t gLocalInfo;
 
 
-namespace Math
-{
-	inline bool W2S(Vec3 &vOrigin, Vec3 &vScreen)
-	{
+namespace Math {
+	inline bool W2S(Vec3 &vOrigin, Vec3 &vScreen) {
 		const matrix3x4 &worldToScreen = gInts.Engine->WorldToScreenMatrix();
 
 		float w = worldToScreen[3][0] * vOrigin[0] + worldToScreen[3][1] * vOrigin[1] + worldToScreen[3][2] * vOrigin[2] + worldToScreen[3][3];
@@ -210,9 +218,7 @@ namespace Math
 	}
 }
 
-//these are for lazily avoiding .h .cpp
-namespace Utils
-{
+namespace Utils {
 	template <typename T>
 	void clamp(T &x, T min, T max)
 	{
@@ -362,6 +368,7 @@ namespace Utils
 		cmd->viewangles		= angs;
 	}
 
+	//obsolete
 	inline bool CanSniperHS(CBaseEntity *local)
 	{
 		if (!local || !local->IsAlive())
@@ -387,6 +394,7 @@ namespace Utils
 		return false;
 	}
 
+	//obsolete
 	inline bool CanSpyHS(CBaseEntity *local) {
 		if (!local || !local->IsAlive())
 			return false;

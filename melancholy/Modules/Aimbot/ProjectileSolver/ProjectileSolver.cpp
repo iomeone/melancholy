@@ -192,7 +192,24 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
 			if (trace.DidHit())
-				predicted_pos = trace.endpos;
+			{
+				Vec3 offset = Vec3(0.0f, 0.0f, 0.0f);
+
+				//I think I can also just check the velocity for these :thinking:
+				if (trace.endpos.z < target.origin.z) {
+					sol.ray_hit_ceiling = true;
+					offset.z = (target.ptr->GetViewOffset().z * 0.9f);
+				}
+
+				else if (trace.endpos.z > target.origin.z) {
+					sol.ray_hit_ground = true;
+					offset.z = -(target.ptr->GetViewOffset().z * 0.9f);
+				}
+
+				//TODO: handle bouncing off of walls
+
+				predicted_pos = (trace.endpos + offset);
+			}
 		}
 
 		if (!Solve2D(origin, weapon, predicted_pos, sol))

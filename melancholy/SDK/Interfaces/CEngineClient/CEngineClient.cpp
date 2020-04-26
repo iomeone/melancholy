@@ -84,6 +84,12 @@ bool CEngineClient::IsTakingScreenshot(void)
 	return GetVFunc<FN>(this, 85)(this);
 }
 
+bool CEngineClient::IsHLTV()
+{
+	typedef bool(__thiscall *FN)(PVOID);
+	return GetVFunc<FN>(this, 86)(this);
+}
+
 DWORD *CEngineClient::GetNetChannelInfo(void)
 {
 	typedef DWORD *(__thiscall *FN)(PVOID);

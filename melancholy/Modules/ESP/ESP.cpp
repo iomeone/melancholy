@@ -148,7 +148,7 @@ RGBA_t CESP::GetEntityColor(ESPEnt_t &ent)
 			if (!ent.ptr->IsVulnerable())
 				out = ColInvuln;
 
-			else if (ent.ptr->GetIndex() == gLocalInfo.CurrentTargetIndex && gAimbot.HighlightTarget)
+			else if (ent.ptr->GetIndex() == gLocalInfo.CurrentTargetIndex && HighlightTarget)
 				out = ColTarget;
 
 			break;
@@ -185,20 +185,7 @@ void CESP::Run()
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
-	if (!pLocal)
-		return;
-
-	//outside active check to visualize it even if ESP is disabled
-	if (pLocal->IsAlive()) {
-		if (!gPredOut.pred_pos.IsZero()) {
-			Vec3 pred_scrn = Vec3(), non_pred_scrn = Vec3();
-
-			if (Math::W2S(gPredOut.pred_pos, pred_scrn) && Math::W2S(gPredOut.non_pred_pos, non_pred_scrn))
-				Draw.Line(non_pred_scrn.x, non_pred_scrn.y, pred_scrn.x, pred_scrn.y, ColGreen);
-		}
-	}
-
-	if (!Active)
+	if (!pLocal || !Active)
 		return;
 
 	if (SpectatorList)

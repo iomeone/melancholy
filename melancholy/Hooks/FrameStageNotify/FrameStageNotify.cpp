@@ -44,4 +44,6 @@ void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t
 
 	if (frame == FRAME_RENDER_START)
 		ThirdpersonDrawFix(pLocal);
+
+	gGlow.Run(pLocal, frame);
 }

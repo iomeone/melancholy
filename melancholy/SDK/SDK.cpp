@@ -483,6 +483,59 @@ void CBaseEntity::RemoveEffect(EffectFlags_t Effect)
 	}
 }
 
+//-------------------------------------------------- Glow Stuff
+
+void CBaseEntity::SetGlowEnabled(bool bState) {
+	DYNVAR_SET(bool, this, bState, "DT_TFPlayer", "m_bGlowEnabled");
+}
+
+bool CBaseEntity::IsGlowEnabled() {
+	DYNVAR_RETURN(bool, this, "DT_TFPlayer", "m_bGlowEnabled");
+}
+
+bool CBaseEntity::HasGlowEffect(int &GlowObjectIdx)
+{
+	for (int n = 0; n < gInts.GlowObject->m_GlowObjectDefinitions.Size(); n++) {
+		if (gInts.EntityList->GetClientEntityFromHandle(gInts.GlowObject->m_GlowObjectDefinitions[n].m_hEntity) == this) {
+			GlowObjectIdx = n;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int CBaseEntity::RegisterGlowObject(Vec3 &vGlowColor, float flGlowAlpha, bool bRenderWhenOccluded, bool bRenderWhenUnoccluded, int nSplitScreenSlot)
+{
+	typedef int(__thiscall *RegisterGlowObjectFn)(CGlowObjectManager *, CBaseEntity *, Vec3 &, float, bool, bool, int);
+	static DWORD dwFn = gPattern.FindInClient("55 8B EC 51 53 56 8B F1 57 8B 5E 14");
+	static RegisterGlowObjectFn Register = (RegisterGlowObjectFn)dwFn;
+
+	return Register(gInts.GlowObject, this, vGlowColor, flGlowAlpha, bRenderWhenOccluded, bRenderWhenUnoccluded, nSplitScreenSlot);
+}
+
+int CBaseEntity::RegisterGlow(Vec3 &vGlowColor, float fAlpha) {
+	int temp = 0;
+	if (HasGlowEffect(temp))
+		return -1;
+
+	return RegisterGlowObject(vGlowColor, fAlpha, true, true, -1);
+}
+
+void CBaseEntity::UnregisterGlow() {
+	int idx = -1;
+
+	if (HasGlowEffect(idx))
+		gInts.GlowObject->m_GlowObjectDefinitions.Remove(idx);
+}
+
+void CBaseEntity::UpdateGlowEffect() {
+	typedef void(__thiscall *FN)(PVOID);
+	return GetVFunc<FN>(this, 226)(this);
+}
+
+//-------------------------------------------------- CTraceFilter
+
 bool CTraceFilter::ShouldHitEntity(void *pEntityHandle, int nContentsMask)
 {
 	CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pEntityHandle);
@@ -780,13 +833,13 @@ void MatHelper_t::ResetMaterial()
 	gInts.ModelRender->ForcedMaterialOverride(nullptr);
 }
 
-void MatHelper_t::ForceMaterial(IMaterial *material, RGBA_t &color)
+void MatHelper_t::ForceMaterial(IMaterial *material, RGBA_t &color, float alpha_override)
 {
 	if (!material)
 		return;
 
 	float clr[3] = { color.R_flt(), color.G_flt(), color.B_flt() };
-	float alpha = color.A_flt();
+	float alpha = (alpha_override < 1.0f ? alpha_override : color.A_flt());
 	gInts.RenderView->SetBlend(alpha);
 	gInts.RenderView->SetColorModulation(clr);
 	gInts.ModelRender->ForcedMaterialOverride(material);

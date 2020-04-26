@@ -1932,3 +1932,16 @@ struct DrawModelState_t
 
 #define DMG_AIRBOAT	(1 << 25)
 #define DMG_USE_HITLOCATIONS (DMG_AIRBOAT)
+
+#define END_OF_FREE_LIST	-1
+#define ENTRY_IN_USE		-2
+
+struct GlowObjectDefinition_t {
+	int			m_hEntity;
+	Vec3		m_vGlowColor;
+	float		m_flGlowAlpha;
+	bool		m_bRenderWhenOccluded;
+	bool		m_bRenderWhenUnoccluded;
+	int			m_nSplitScreenSlot;
+	int			m_nNextFreeSlot;
+};

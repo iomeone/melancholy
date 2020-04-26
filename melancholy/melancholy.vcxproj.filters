@@ -75,9 +75,6 @@
     <Filter Include="Header Files\Helpers\Color">
       <UniqueIdentifier>{0af28b7c-7b77-4dec-8e50-410b4413217a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Helpers\Input">
-      <UniqueIdentifier>{93636ed5-913a-4bbb-b0ee-05c029c9d961}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Hooks">
       <UniqueIdentifier>{d2140742-be94-498b-9a89-29753caefea5}</UniqueIdentifier>
     </Filter>
@@ -159,6 +156,15 @@
     <Filter Include="Header Files\SDK\Interfaces\IEngineVGui">
       <UniqueIdentifier>{3be2b125-48f3-4414-92a2-0a715dd2d3ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\CGlowObjectManager">
+      <UniqueIdentifier>{ac56ea45-5593-4fff-99a8-017f9f3394bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers\UtlVector">
+      <UniqueIdentifier>{0aa45168-03b0-4980-ad09-5bb4242cd172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modules\Glow">
+      <UniqueIdentifier>{47bd9af0-8c74-4bd0-8709-add9a51a34ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -211,9 +217,6 @@
     </ClCompile>
     <ClCompile Include="Helpers\Color\Color.cpp">
       <Filter>Header Files\Helpers\Color</Filter>
-    </ClCompile>
-    <ClCompile Include="Helpers\Input\Input.cpp">
-      <Filter>Header Files\Helpers\Input</Filter>
     </ClCompile>
     <ClCompile Include="Hooks\CreateMove\CreateMove.cpp">
       <Filter>Header Files\Hooks\CreateMove</Filter>
@@ -302,6 +305,9 @@
     <ClCompile Include="SDK\Interfaces\IEngineVGui\IEngineVGui.cpp">
       <Filter>Header Files\SDK\Interfaces\IEngineVGui</Filter>
     </ClCompile>
+    <ClCompile Include="Modules\Glow\Glow.cpp">
+      <Filter>Header Files\Modules\Glow</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Helpers\Interface\Interface.h">
@@ -369,9 +375,6 @@
     </ClInclude>
     <ClInclude Include="Helpers\Color\Color.h">
       <Filter>Header Files\Helpers\Color</Filter>
-    </ClInclude>
-    <ClInclude Include="Helpers\Input\Input.h">
-      <Filter>Header Files\Helpers\Input</Filter>
     </ClInclude>
     <ClInclude Include="Hooks\CreateMove\CreateMove.h">
       <Filter>Header Files\Hooks\CreateMove</Filter>
@@ -477,6 +480,15 @@
     </ClInclude>
     <ClInclude Include="SDK\Interfaces\IEngineVGui\IEngineVGui.h">
       <Filter>Header Files\SDK\Interfaces\IEngineVGui</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\CGlowObjectManager\CGlowObjectManager.h">
+      <Filter>Header Files\SDK\Interfaces\CGlowObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\UtlVector\UtlVector.h">
+      <Filter>Header Files\Helpers\UtlVector</Filter>
+    </ClInclude>
+    <ClInclude Include="Modules\Glow\Glow.h">
+      <Filter>Header Files\Modules\Glow</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,11 +1,8 @@
 #include "Aimbot.h"
 
-//this entire thing is aimed to be used on players, buildings were in mind at some point in development but I scratched them
-//shouldn't be too hard to put 'em in
-
 Vec3 SmoothStartAngle	= Vec3();
 float SmoothStartTime	= 0.0f;
-bool EasingDone			= false; //used for projectile autoshoot
+bool EasingDone			= false; //used for projectile autoshoot (kinda sucks)
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -60,20 +57,26 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 
 		if (ProjectileInfo.speed > 0.0f)
 		{
-			//quite a few weapons have their own custom offsets, only doing pipes here
-			//if (ProjectileInfo.is_pipe) {
-			//	Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-			//	Math::AngleVectors(pLocal->GetEyeAngles(), &vecForward, &vecRight, &vecUp);
-			//	static const float fRight = 8.0f; //this should be *= -1.0f if the viewmodels are fliped!
-			//	v.local_pos += ((vecForward * 16.0f) + (vecRight * fRight) + (vecUp * -6.0f));
-			//}
+			if (!ProjectileAim)
+				return {};
+
+			if (ProjectileInfo.is_pipe) {
+				Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+				Math::AngleVectors(pLocal->GetEyeAngles(), &vecForward, &vecRight, &vecUp);
+				static const float fRight = 8.0f; //this should be *= -1.0f if the viewmodels are fliped!
+				v.local_pos += ((vecForward * 16.0f) + (vecRight * fRight) + (vecUp * -6.0f));
+			}
 
 			CPredictor Predictor(v.ent_pos, v.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), v.ptr);
 			Solution_t Solution = {};
 
 			//vis checking is done inside this func
 			if (Solve(v.local_pos, ProjectileWep, Predictor, Solution, v.ptr->IsOnGround())) {
-				float finalOffset = (ProjectileInfo.is_pipe ? (v.ptr->IsOnGround() ? 2.0f : 4.0f) : 0.0f);
+				//m a g i c n u m b e r s
+				float finalOffset = (ProjectileInfo.is_pipe ?
+					((v.ptr->IsOnGround() || Solution.ray_hit_ground) ?
+						2.0f : (v.ptr->GetVelocity().z < 0.0f ? 8.5f : 6.0f)) : 0.0f);
+
 				v.ang_to_ent = { -(RAD2DEG(Solution.pitch) - finalOffset), RAD2DEG(Solution.yaw), 0.0f };
 				v.fov = Math::CalcFov(LocalAngles, v.ang_to_ent); //recalculate
 			}
@@ -338,7 +341,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped())) {
 			int wep_idx = pLocalWeapon->GetItemDefinitionIndex();
 			if (wep_idx != Sniper_m_TheHuntsman && wep_idx != Sniper_m_FestiveHuntsman && wep_idx != Sniper_m_TheFortifiedCompound) {
-				SmoothStartTime = gInts.Globals->curtime;
+				SmoothStartTime = gInts.Globals->curtime; //these are reset in 4 places, need to do it differently
 				SmoothStartAngle = cmd->viewangles;
 				return;
 			}
@@ -349,7 +352,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 			gLocalInfo.CurrentTargetIndex = target.ptr->GetIndex();
 
 			if (TargetChanged()) {
-				SmoothStartTime = gInts.Globals->curtime; //these are reset in 4 places, need to do it differently
+				SmoothStartTime = gInts.Globals->curtime;
 				SmoothStartAngle = cmd->viewangles;
 			}
 

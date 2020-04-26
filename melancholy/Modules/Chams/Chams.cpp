@@ -5,20 +5,20 @@ void CChams::Run()
 	auto cham = [&](CBaseEntity *ent, IMaterial *mat, RGBA_t &col, ChamMode_t mode) -> void
 	{
 		if (!mat)
-			return;
+			return;	
 
 		switch (mode)
 		{
 			case ChamMode_t::VISIBLE: {
 				mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-				gMatHelper.ForceMaterial(mat, col);
+				gMatHelper.ForceMaterial(mat, col, AlphaOverride);
 				ent->DrawModel(0x1);
 				break;
 			}
 
 			case ChamMode_t::INVISIBLE: {
 				mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-				gMatHelper.ForceMaterial(mat, col);
+				gMatHelper.ForceMaterial(mat, col, AlphaOverride);
 				ent->DrawModel(0x1);
 
 				gMatHelper.ResetMaterial();
@@ -28,11 +28,11 @@ void CChams::Run()
 
 			case ChamMode_t::ALWAYS: {
 				mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-				gMatHelper.ForceMaterial(mat, col);
+				gMatHelper.ForceMaterial(mat, col, AlphaOverride);
 				ent->DrawModel(0x1);
 
 				mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, false);
-				gMatHelper.ForceMaterial(mat, col);
+				gMatHelper.ForceMaterial(mat, col, AlphaOverride);
 				ent->DrawModel(0x1);
 				break;
 			}
@@ -41,27 +41,7 @@ void CChams::Run()
 		gMatHelper.ResetMaterial();
 	};
 
-	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame())
-		return;
-
-	if (gAimbot.Active && gAimbot.HighlightTarget)
-	{
-		if (gLocalInfo.CurrentTargetIndex != -1)
-		{
-			CBaseEntity *ent = gInts.EntityList->GetClientEntity(gLocalInfo.CurrentTargetIndex);
-
-			if (ent) {
-				IMaterial *mat = gMatHelper.wireframe;
-				mat->SetMaterialVarFlag(MATERIAL_VAR_IGNOREZ, true);
-				gMatHelper.ForceMaterial(mat, gESP.ColTarget);
-				ent->DrawModel(0x1);
-				gMatHelper.ResetMaterial();
-				ent->DrawModel(0x1);
-			}
-		}
-	}
-
-	if (!Active)
+	if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame())
 		return;
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
@@ -96,8 +76,10 @@ void CChams::Run()
 				if (PlayerWeapons) {
 					CBaseCombatWeapon *weapon = ent->GetActiveWeapon();
 
+					static RGBA_t white = RGBA_t(255, 255, 255, 255);
+
 					if (weapon)
-						cham(weapon, mat, gESP.ColWhite, mode);
+						cham(weapon, mat, white, mode);
 				}
 			}
 		}
