@@ -62,9 +62,14 @@ void CChams::Run()
 		{
 			if (PlayerChams && (NoTeammatePlayers ? ent->GetTeamNum() != pLocal->GetTeamNum() : true))
 			{
-				IMaterial *mat = (PlayerChams < 2 ? gMatHelper.shaded : gMatHelper.flat);
-				ChamMode_t mode = ChamMode_t::DEFAULT;
+				IMaterial *mat = nullptr;
+				switch (PlayerChams) {
+					case 1: { mat = gMatHelper.shaded; break; }
+					case 2: { mat = gMatHelper.flat; break; }
+					case 3: { mat = gMatHelper.wireframe; break; }
+				}
 
+				ChamMode_t mode = ChamMode_t::DEFAULT;
 				switch (PlayerChamsMode) {
 					case 0: { mode = ChamMode_t::VISIBLE; break; }
 					case 1: { mode = ChamMode_t::INVISIBLE; break; }
@@ -88,9 +93,14 @@ void CChams::Run()
 		{
 			if (BuildingChams && (NoTeammateBuildings ? ent->GetTeamNum() != pLocal->GetTeamNum() : true))
 			{
-				IMaterial *mat = (BuildingChams < 2 ? gMatHelper.shaded : gMatHelper.flat);
-				ChamMode_t mode = ChamMode_t::DEFAULT;
+				IMaterial *mat = nullptr;
+				switch (BuildingChams) {
+					case 1: { mat = gMatHelper.shaded; break; }
+					case 2: { mat = gMatHelper.flat; break; }
+					case 3: { mat = gMatHelper.wireframe; break; }
+				}
 
+				ChamMode_t mode = ChamMode_t::DEFAULT;
 				switch (BuildingChamsMode) {
 					case 0: { mode = ChamMode_t::VISIBLE; break; }
 					case 1: { mode = ChamMode_t::INVISIBLE; break; }
@@ -105,9 +115,14 @@ void CChams::Run()
 		{
 			if (PickupChams)
 			{
-				IMaterial *mat = (PickupChams < 2 ? gMatHelper.shaded : gMatHelper.flat);
-				ChamMode_t mode = ChamMode_t::DEFAULT;
+				IMaterial *mat = nullptr;
+				switch (PickupChams) {
+					case 1: { mat = gMatHelper.shaded; break; }
+					case 2: { mat = gMatHelper.flat; break; }
+					case 3: { mat = gMatHelper.wireframe; break; }
+				}
 
+				ChamMode_t mode = ChamMode_t::DEFAULT;
 				switch (PickupChamsMode) {
 					case 0: { mode = ChamMode_t::VISIBLE; break; }
 					case 1: { mode = ChamMode_t::INVISIBLE; break; }
@@ -130,9 +145,14 @@ void CChams::Run()
 
 			if (PlayerChams && (NoTeammatePlayers ? owner->GetTeamNum() != pLocal->GetTeamNum() : true) && PlayerCosmetics)
 			{
-				IMaterial *mat = (PlayerChams < 2 ? gMatHelper.shaded : gMatHelper.flat);
-				ChamMode_t mode = ChamMode_t::DEFAULT;
+				IMaterial *mat = nullptr;
+				switch (PlayerChams) {
+					case 1: { mat = gMatHelper.shaded; break; }
+					case 2: { mat = gMatHelper.flat; break; }
+					case 3: { mat = gMatHelper.wireframe; break; }
+				}
 
+				ChamMode_t mode = ChamMode_t::DEFAULT;
 				switch (PlayerChamsMode) {
 					case 0: { mode = ChamMode_t::VISIBLE; break; }
 					case 1: { mode = ChamMode_t::INVISIBLE; break; }

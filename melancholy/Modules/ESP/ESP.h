@@ -14,11 +14,6 @@ struct ESPEnt_t {
 	float dist = FLT_MAX;
 };
 
-struct Spectator_t {
-	std::string name = "";
-	std::string mode = "";
-};
-
 class CESP
 {
 private:
@@ -26,7 +21,6 @@ private:
 	const int FontTallSmall = 11;
 	Draw_t Draw;
 	Draw_t DrawSmall;
-
 
 private:
 	std::vector<ESPEnt_t> Entities;
@@ -78,12 +72,12 @@ public:
 	bool BuildingBox			= false;
 
 	//-------------------------------------------------- pickups
-	bool PickupName		= false;
+	bool PickupName	= false;
 
+	//--------------------------------------------------
+
+	Draw_t DrawMark;
 	void Run();
-
-	std::vector<Spectator_t> Spectators;
-
 	void ReloadFonts();
 };
 

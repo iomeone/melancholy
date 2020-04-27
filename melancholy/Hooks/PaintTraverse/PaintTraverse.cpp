@@ -38,26 +38,27 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 			return;
 
 		CBaseEntity *local = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
-		if (local && local->IsAlive()) {
+
+		if (local && local->IsAlive())
 			local->ForceTauntCam(gESP.Active && gESP.Thirdperson);
-		}
 
 		gESP.Run();
 
-		if (!gInts.Engine->IsConnected() && !gInts.Engine->IsDrawingLoadingImage()) {
+		if (!gInts.Engine->IsConnected() && !gInts.Engine->IsDrawingLoadingImage()) 
+		{
 			gInts.Panels->SetTopmostPopup(vgui_panel, true);
 
-			static Draw_t draw = Draw_t("Arial", 16, 0, FONTFLAG_OUTLINE);
 			static std::string msg0 = "melancholy by spook953";
-			static std::string msg1 = ("build date " + std::string(__DATE__) + " " + std::string(__TIME__));
+			static std::string msg1 = ("build date " + std::string(__DATE__));
 
 			RGBA_t col = Utils::Rainbow();
 			static int w = 0, h = 0;
 
-			gInts.Surface->GetTextSize(draw.dwFont, Utils::ToWC(msg0.c_str()), w, h);
-			draw.String((gScreenSize.w / 2) - (w / 2), 100, col, msg0.c_str());
-			gInts.Surface->GetTextSize(draw.dwFont, Utils::ToWC(msg1.c_str()), w, h);
-			draw.String((gScreenSize.w / 2) - (w / 2), 115, col, msg1.c_str());
+			gInts.Surface->GetTextSize(gESP.DrawMark.dwFont, Utils::ToWC(msg0.c_str()), w, h);
+			gESP.DrawMark.String((gScreenSize.w / 2) - (w / 2), 100, col, msg0.c_str());
+
+			gInts.Surface->GetTextSize(gESP.DrawMark.dwFont, Utils::ToWC(msg1.c_str()), w, h);
+			gESP.DrawMark.String((gScreenSize.w / 2) - (w / 2), 115, col, msg1.c_str());
 		}
 	}
 }

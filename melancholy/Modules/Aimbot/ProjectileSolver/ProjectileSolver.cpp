@@ -163,13 +163,19 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 
 	if (g > 0.0f) {
 		const float dy = v.z;
+
 		if (!Optimal(dx, dy, v0, g, sol.pitch))
 			return false;
+
+		sol.yaw = atan2(v.y, v.x);
 	}
 	
-	else sol.pitch = -DEG2RAD(Math::CalcAngle(origin, target).x); //Pepega
+	else {
+		Vec3 ang = Math::CalcAngle(origin, target);
+		sol.pitch = -DEG2RAD(ang.x);
+		sol.yaw = DEG2RAD(ang.y);
+	}
 
-	sol.yaw = atan2(v.y, v.x);
 	sol.time = dx / (cos(sol.pitch) * v0);
 	return true;
 }
@@ -191,24 +197,9 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 			CGameTrace trace;
 			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
-			if (trace.DidHit())
-			{
-				Vec3 offset = Vec3(0.0f, 0.0f, 0.0f);
-
-				//I think I can also just check the velocity for these :thinking:
-				if (trace.endpos.z < target.origin.z) {
-					sol.ray_hit_ceiling = true;
-					offset.z = (target.ptr->GetViewOffset().z * 0.9f);
-				}
-
-				else if (trace.endpos.z > target.origin.z) {
-					sol.ray_hit_ground = true;
-					offset.z = -(target.ptr->GetViewOffset().z * 0.9f);
-				}
-
-				//TODO: handle bouncing off of walls
-
-				predicted_pos = (trace.endpos + offset);
+			if (trace.DidHit()) {
+				//TODO: bouncing off of walls
+				predicted_pos = trace.endpos;
 			}
 		}
 
@@ -226,13 +217,9 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 			if (trace.fraction < 0.99f)
 				return false;
 
-			gPredOut.pred_pos = predicted_pos;
-			gPredOut.non_pred_pos = target.origin;
 			return true;
 		}
 	}
 
 	return false;
 }
-
-PredOut_t gPredOut;

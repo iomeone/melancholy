@@ -21,7 +21,10 @@ HRESULT WINAPI DirectX::ResetHook(IDirect3DDevice9 *pDevice, D3DPRESENT_PARAMETE
 	VMTManager &hook = VMTManager::GetHook(pDevice);
 	
 	ImGui_ImplDX9_InvalidateDeviceObjects();
+
+	HRESULT ret = hook.GetMethod<ResetFN>(ResetIndex)(pDevice, pPresentParams);
+
 	ImGui_ImplDX9_CreateDeviceObjects();
 	
-	return hook.GetMethod<ResetFN>(ResetIndex)(pDevice, pPresentParams);
+	return ret;
 }

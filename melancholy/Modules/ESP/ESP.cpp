@@ -176,62 +176,30 @@ void CESP::Run()
 		if (!font_init) {
 			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
 			DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
+			DrawMark = Draw_t("Arial", 16, 0, FONTFLAG_OUTLINE);
 			font_init = true;
 		}
 	}
 
-	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
+	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame()) {
+		if (!Entities.empty())
+			Entities.clear();
+
+		return;
+	}
+
+	if (gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
-	if (!pLocal || !Active)
+	if (!pLocal || !Active) {
+		if (!Entities.empty())
+			Entities.clear();
+
 		return;
-
-	if (SpectatorList)
-	{
-		if (!Spectators.empty())
-			Spectators.clear();
-
-		if (pLocal->IsAlive())
-		{
-			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
-			{
-				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
-
-				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
-					continue;
-
-				PlayerInfo_t info;
-
-				if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &info))
-					continue;
-
-				CBaseEntity *obs_target = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
-
-				if (!obs_target || obs_target != pLocal || !obs_target->IsAlive())
-					continue;
-
-				auto GetMode = [&](CBaseEntity *ent) -> std::string {
-					switch (ent->GetObserverMode()) {
-						case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
-						case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
-						default: return std::string();
-					}
-				};
-
-				std::string mode = GetMode(ent);
-
-				if (mode.empty())
-					continue;
-
-				Spectators.push_back({ info.name, mode });
-
-				//drawing is in Menu.cpp
-			}
-		}
 	}
-	
+
 	if (GetEntities(pLocal))
 	{
 		for (auto &v : Entities)
@@ -555,6 +523,7 @@ void CESP::Run()
 void CESP::ReloadFonts() {
 	Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
 	DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
+	DrawMark = Draw_t("Arial", 16, 0, FONTFLAG_OUTLINE);
 }
 
 CESP gESP;

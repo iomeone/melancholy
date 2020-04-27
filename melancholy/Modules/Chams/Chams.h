@@ -1,8 +1,7 @@
 #pragma once
 #include "../../SDK/SDK.h"
 
-class CChams
-{
+class CChams {
 private:
 	enum struct ChamMode_t {
 		DEFAULT = -1,
@@ -15,14 +14,14 @@ public:
 	bool Active	= false;
 	float AlphaOverride = 0.1f;
 
-	int PlayerChams			= 2; //0 off 1 shaded 2 flat
-	int PlayerChamsMode		= 2; //0 visible 1 invisible 2 always
+	int PlayerChams			= 2; //0 off 1 shaded 2 flat 3 wireframe
+	int PlayerChamsMode		= 1; //0 visible 1 invisible 2 always
 	bool NoTeammatePlayers	= true;
 	bool PlayerCosmetics	= true;
 	bool PlayerWeapons		= true;
 
 	int BuildingChams			= 2;
-	int BuildingChamsMode		= 2;
+	int BuildingChamsMode		= 1;
 	bool NoTeammateBuildings	= true;
 
 	int PickupChams		= 2;

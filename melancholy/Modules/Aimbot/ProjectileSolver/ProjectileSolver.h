@@ -36,9 +36,4 @@ struct Solution_t {
 	bool ray_hit_ceiling	= false;
 };
 
-struct PredOut_t {
-	Vec3 pred_pos = Vec3();
-	Vec3 non_pred_pos = Vec3();
-}; extern PredOut_t gPredOut;
-
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground);

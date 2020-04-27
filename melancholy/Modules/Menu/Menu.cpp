@@ -128,7 +128,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Checkbox		("autoshoot",			&gAimbot.Autoshoot);
 						ImGui::Combo		("key",					&gAimbot.AimKey, szKeys, IM_ARRAYSIZE(szKeys));
 						ImGui::InputFloat	("fov",					&gAimbot.AimFov, 1.0f, 1.0f, 0);
-						ImGui::SliderFloat	("aim time",			&gAimbot.AimTime, 0.0f, 1.0f, "%.1f", 1.0f);
+						ImGui::SliderFloat	("aim time",			&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
 						
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -335,154 +335,162 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 					ImGui::EndTabItem();
 				}
 
-				if (ImGui::BeginTabItem("chams"))
+				if (ImGui::BeginTabItem("visuals"))
 				{
-					static const char *szChams[]		= { "off", "shaded", "flat" };
-					static const char *szChamsMode[]	= { "visible", "invisible", "always" };
-					static const char *szGlow[]			= { "off", "team", "health" };
-
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
-
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 6.5f), true))
+					if (ImGui::BeginTabBar("visuals_tabs", ImGuiTabBarFlags_NoTooltip))
 					{
-						ImGui::Text("main");
+						if (ImGui::BeginTabItem("chams"))
+						{
+							static const char *szChams[] = { "off", "shaded", "flat", "wireframe" };
+							static const char *szChamsMode[] = { "visible", "invisible", "always" };
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-						ImGui::Checkbox		("active",	&gChams.Active);
-						ImGui::SliderFloat	("alpha",	&gChams.AlphaOverride, 0.1f, 1.0f, "%.1f");
+							if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 6.5f), true))
+							{
+								ImGui::Text("main");
 
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+								ImGui::Checkbox("active", &gChams.Active);
+								ImGui::SliderFloat("alpha", &gChams.AlphaOverride, 0.1f, 1.0f, "%.1f");
 
-					if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
-					{
-						ImGui::Text("players");
-						ImGui::PushItemWidth(90.0f);
+								ImGui::EndChild();
+							}
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-						ImGui::Checkbox("no teammates", &gChams.NoTeammatePlayers);
-						ImGui::Checkbox("cosmetics",	&gChams.PlayerCosmetics);
-						ImGui::Checkbox("weapons",		&gChams.PlayerWeapons);
+							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							{
+								ImGui::Text("players");
+								ImGui::PushItemWidth(90.0f);
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-						ImGui::Combo("type",	&gChams.PlayerChams,		szChams,		IM_ARRAYSIZE(szChams));
-						ImGui::Combo("mode",	&gChams.PlayerChamsMode,	szChamsMode,	IM_ARRAYSIZE(szChamsMode));
+								ImGui::Checkbox("no teammates", &gChams.NoTeammatePlayers);
+								ImGui::Checkbox("cosmetics", &gChams.PlayerCosmetics);
+								ImGui::Checkbox("weapons", &gChams.PlayerWeapons);
 
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::SameLine();
+								ImGui::Combo("type", &gChams.PlayerChams, szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode", &gChams.PlayerChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
 
-					if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
-					{
-						ImGui::Text("buildings");
-						ImGui::PushItemWidth(90.0f);
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SameLine();
 
-						ImGui::Checkbox("no teammates", &gChams.NoTeammateBuildings);
+							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							{
+								ImGui::Text("buildings");
+								ImGui::PushItemWidth(90.0f);
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-						ImGui::Combo("type", &gChams.BuildingChams,		szChams,		IM_ARRAYSIZE(szChams));
-						ImGui::Combo("mode", &gChams.BuildingChamsMode, szChamsMode,	IM_ARRAYSIZE(szChamsMode));
+								ImGui::Checkbox("no teammates", &gChams.NoTeammateBuildings);
 
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::SameLine();
+								ImGui::Combo("type", &gChams.BuildingChams, szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode", &gChams.BuildingChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
 
-					if (ImGui::BeginChild("pickup_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
-					{
-						ImGui::Text("pickups");
-						ImGui::PushItemWidth(90.0f);
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SameLine();
 
-						ImGui::Combo("type", &gChams.PickupChams,		szChams,		IM_ARRAYSIZE(szChams));
-						ImGui::Combo("mode", &gChams.PickupChamsMode,	szChamsMode,	IM_ARRAYSIZE(szChamsMode));
+							if (ImGui::BeginChild("pickup_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							{
+								ImGui::Text("pickups");
+								ImGui::PushItemWidth(90.0f);
 
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::EndTabItem();
-				}
+								ImGui::Combo("type", &gChams.PickupChams, szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode", &gChams.PickupChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
 
-				if (ImGui::BeginTabItem("glow"))
-				{
-					static const char *szGlow[]			= { "off", "team", "health" };
-					static const char *szGlowPickup[]	= { "off", "on" };
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
 
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+							ImGui::EndTabItem();
+						}
 
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 6.5f), true))
-					{
-						ImGui::Text("main");
+						if (ImGui::BeginTabItem("glow"))
+						{
+							static const char *szGlow[] = { "off", "team", "health" };
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-						ImGui::Checkbox		("active",	&gGlow.Active);
-						ImGui::SliderFloat	("alpha",	&gGlow.GlowAlpha, 0.1f, 1.0f, "%.1f");
+							if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 6.5f), true))
+							{
+								ImGui::Text("main");
 
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+								ImGui::Checkbox("active", &gGlow.Active);
+								ImGui::SliderFloat("alpha", &gGlow.GlowAlpha, 0.1f, 1.0f, "%.1f");
 
-					if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
-					{
-						ImGui::Text("players");
-						ImGui::PushItemWidth(90.0f);
+								ImGui::EndChild();
+							}
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-						ImGui::Combo	("glow",			&gGlow.PlayerGlow, szGlow, IM_ARRAYSIZE(szGlow));
-						ImGui::Checkbox	("no teammates",	&gGlow.NoTeammatePlayers);
+							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							{
+								ImGui::Text("players");
+								ImGui::PushItemWidth(90.0f);
 
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-					}
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-					ImGui::SameLine();
+								ImGui::Combo("glow", &gGlow.PlayerGlow, szGlow, IM_ARRAYSIZE(szGlow));
+								ImGui::Checkbox("no teammates", &gGlow.NoTeammatePlayers);
 
-					if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
-					{
-						ImGui::Text("buildings");
-						ImGui::PushItemWidth(90.0f);
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
 
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-						ImGui::Separator();
-						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+							ImGui::SameLine();
 
-						ImGui::Combo	("glow",			&gGlow.BuildingGlow, szGlow, IM_ARRAYSIZE(szGlow));
-						ImGui::Checkbox	("no teammates",	&gGlow.NoTeammateBuildings);
+							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							{
+								ImGui::Text("buildings");
+								ImGui::PushItemWidth(90.0f);
 
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+								ImGui::Separator();
+								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+								ImGui::Combo("glow", &gGlow.BuildingGlow, szGlow, IM_ARRAYSIZE(szGlow));
+								ImGui::Checkbox("no teammates", &gGlow.NoTeammateBuildings);
+
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
+
+							ImGui::EndTabItem();
+						}
+
+						ImGui::EndTabBar();
 					}
 
 					ImGui::EndTabItem();
@@ -522,10 +530,53 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 		&& !gInts.Engine->Con_IsVisible()
 		&& !gInts.EngineVGui->IsGameUIVisible())
 	{
-		std::string title = std::string("spectators (" + std::to_string(gESP.Spectators.size()) + ")###");
-		if (ImGui::Begin(title.c_str(), nullptr, windowFlags)) //I just messed around until this whole thing worked xd
+		//maybe moving this here will fix the ghost spectators?
+		if (!Spectators.empty())
+			Spectators.clear();
+
+		CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
+
+		if (pLocal && pLocal->IsAlive())
 		{
-			ImGui::SetWindowSize(ImVec2(200.0f, (44.0f + ((ImGui::GetFontSize() + 5.0f) * gESP.Spectators.size()))));
+			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
+			{
+				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
+
+				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
+					continue;
+
+				PlayerInfo_t info;
+
+				if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &info))
+					continue;
+
+				CBaseEntity *obs_target = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
+
+				if (!obs_target || obs_target->GetIndex() != pLocal->GetIndex() || !obs_target->IsAlive())
+					continue;
+
+				auto GetMode = [&](CBaseEntity *ent) -> std::string {
+					switch (ent->GetObserverMode()) {
+						case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
+						case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
+						default: return std::string();
+					}
+				};
+
+				std::string mode = GetMode(ent);
+
+				if (mode.empty())
+					continue;
+
+				Spectators.push_back({ info.name, mode });
+			}
+		}
+
+		std::string title = std::string("spectators (" + std::to_string(Spectators.size()) + ")###");
+
+		if (ImGui::Begin(title.c_str(), nullptr, windowFlags))
+		{
+			ImGui::SetWindowSize(ImVec2(200.0f, (45.0f + ((ImGui::GetFontSize() + 5.0f) * Spectators.size()))));
 			ImGui::Columns(2);
 
 			ImGui::Text("name");
@@ -533,21 +584,19 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 			ImGui::SetColumnOffset(ImGui::GetColumnIndex(), (ImGui::GetWindowWidth() / 2.0f));
 			ImGui::Text("mode");
 
-			if (gESP.Spectators.size() > 0) {
+			if (Spectators.size() > 0) {
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
 				ImGui::Separator();
 			}
 			
-			for (size_t n = 0; n < gESP.Spectators.size(); n++)
+			for (size_t n = 0; n < Spectators.size(); n++)
 			{
-				Spectator_t v = gESP.Spectators.at(n);
-
 				ImGui::NextColumn();
-				ImGui::Text(v.name.c_str());
+				ImGui::Text(Spectators.at(n).name.c_str());
 				ImGui::NextColumn();
-				ImGui::Text(v.mode.c_str());
+				ImGui::Text(Spectators.at(n).mode.c_str());
 				
-				if (n < (gESP.Spectators.size() - 1))
+				if (n < (Spectators.size() - 1))
 					ImGui::Separator();
 			}
 

@@ -73,12 +73,10 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 			//vis checking is done inside this func
 			if (Solve(v.local_pos, ProjectileWep, Predictor, Solution, v.ptr->IsOnGround())) {
 				//m a g i c n u m b e r s
-				float finalOffset = (ProjectileInfo.is_pipe ?
-					((v.ptr->IsOnGround() || Solution.ray_hit_ground) ?
-						2.0f : (v.ptr->GetVelocity().z < 0.0f ? 8.5f : 6.0f)) : 0.0f);
+				float finalOffset = (ProjectileInfo.is_pipe ? ((v.ptr->IsOnGround() || Solution.ray_hit_ground) ? 2.0f : (v.ptr->GetVelocity().z < 0.0f ? 8.5f : 6.0f)) : 0.0f);
 
 				v.ang_to_ent = { -(RAD2DEG(Solution.pitch) - finalOffset), RAD2DEG(Solution.yaw), 0.0f };
-				v.fov = Math::CalcFov(LocalAngles, v.ang_to_ent); //recalculate
+				v.fov = Math::CalcFov(LocalAngles, v.ang_to_ent); //recalculate, dunno if this is neccessary
 			}
 
 			else continue;
@@ -189,17 +187,13 @@ int CAimbot::GetAimHitbox(CBaseEntity *pLocal, CBaseCombatWeapon *wep)
 		int wep_slot = wep->GetSlot();
 		int wep_idx = wep->GetItemDefinitionIndex();
 
-		switch (pLocal->GetClassNum())
-		{
-			case TF2_Sniper: {
+		switch (pLocal->GetClassNum()) {
+			case TF2_Sniper:
 				return (wep_slot == 0 ? HITBOX_HEAD : HITBOX_PELVIS);
-			}
-
-			case TF2_Spy: {
+			case TF2_Spy:
 				return ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) ? HITBOX_HEAD : HITBOX_PELVIS);
-			}
-
-			default: return HITBOX_PELVIS;
+			default:
+				return HITBOX_PELVIS;
 		}
 	}
 
@@ -214,7 +208,7 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 {
 	Math::ClampAngles(target.ang_to_ent);
 
-	if (AimTime > 0.0f) {
+	if (AimTime > 0.0f) { //this looks so messy, maybe a bit too messy
 		cmd->viewangles = SmoothStartAngle;
 		float time = std::clamp(((gInts.Globals->curtime - SmoothStartTime) / AimTime), 0.0f, 1.0f);
 		Vec3 delta = (target.ang_to_ent - SmoothStartAngle);
@@ -240,13 +234,8 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Target_t &target, CUserCmd *cmd)
 {
-	int wep_slot	= wep->GetSlot();
-	int wep_idx		= wep->GetItemDefinitionIndex();
-	int class_num	= pLocal->GetClassNum();
-
-	if (AimTime > 0.0f)
-	{
-		//this is basically a triggerbot x)
+	if (AimTime > 0.0f) {
+		//this is basically a triggerbot
 		if (!EasingDone)
 		{
 			Vec3 vForward = Vec3();
@@ -267,7 +256,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 				if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
 					return false;
 
-				if ((gInts.Globals->curtime - timer) < 0.05f)
+				if ((gInts.Globals->curtime - timer) < 0.05f) //wait a bit so we don't shoot the very edge of the hitbox
 					return false;
 			}
 
@@ -277,6 +266,12 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 			}
 		}
 	}
+
+	//do all the other checks after the easing is done
+
+	int wep_slot	= wep->GetSlot();
+	int wep_idx		= wep->GetItemDefinitionIndex();
+	int class_num	= pLocal->GetClassNum();
 
 	if (class_num == TF2_Spy && wep_slot == 2) {
 		if (AimMelee && AutoBackstab) {
@@ -294,7 +289,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 	if (wep_slot < 2)
 	{
 		if (class_num == TF2_Sniper) {
-			if (wep_slot == 0 && WaitForHS && pLocal->IsScoped() && !gLocalInfo.CanHeadShot)
+			if (wep_slot == 0 && pLocal->IsScoped() && WaitForHS && !gLocalInfo.CanHeadShot)
 				return false;
 		}
 
@@ -312,24 +307,32 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 	return true;
 }
 
-bool CAimbot::TargetChanged() {
+bool CAimbot::TargetChanged()
+{
 	static int old_target = gLocalInfo.CurrentTargetIndex;
+
 	if (gLocalInfo.CurrentTargetIndex != old_target) {
 		old_target = gLocalInfo.CurrentTargetIndex;
 		return true;
 	}
+
 	return false;
 }
 
 void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd)
 {
-	if (!Active 
-		|| !pLocal->IsAlive() 
+	if (!Active
+		|| !pLocal->IsAlive()
 		|| pLocal->IsTaunting()
 		|| !gInts.Engine->IsConnected()
 		|| !gInts.Engine->IsInGame()
 		|| gInts.Engine->Con_IsVisible())
+	{
+		if (!Targets.empty())
+			Targets.clear();
+
 		return;
+	}
 
 	if (!AimMelee && pLocalWeapon->GetSlot() == 2)
 		return;

@@ -774,11 +774,10 @@ CKeyVals gKeyVals;
 
 //-------------------------------------------------- MatHelper_t
 
-void MatHelper_t::Initialize()
-{
+void MatHelper_t::Initialize() {
 	shaded		= CreateMaterial(false, false, false, true);
 	flat		= CreateMaterial(false, true, false, false);
-	wireframe	= CreateMaterial(false, true, true, false); //how does add shine work? :thinking:
+	wireframe	= CreateMaterial(false, true, true, false);
 }
 
 IMaterial *MatHelper_t::CreateMaterial(bool ignorez, bool flat, bool wireframe, bool add_shine)

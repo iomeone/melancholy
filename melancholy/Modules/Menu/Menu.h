@@ -20,6 +20,13 @@ private:
 		| ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoSavedSettings);
 
+	struct Spectator_t {
+		std::string name = "";
+		std::string mode = "";
+	};
+
+	std::vector<Spectator_t> Spectators;
+
 public:
 	bool bOpen = false;
 
