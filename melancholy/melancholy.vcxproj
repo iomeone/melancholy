@@ -159,6 +159,7 @@
     <ClCompile Include="Hooks\DrawModelExecute\DrawModelExecute.cpp" />
     <ClCompile Include="Hooks\FrameStageNotify\FrameStageNotify.cpp" />
     <ClCompile Include="Hooks\Hooks.cpp" />
+    <ClCompile Include="Hooks\LevelInit\LevelInit.cpp" />
     <ClCompile Include="Hooks\LockCursor\LockCursor.cpp" />
     <ClCompile Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.cpp" />
     <ClCompile Include="Hooks\OverrideView\OverrideView.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="Hooks\DrawModelExecute\DrawModelExecute.h" />
     <ClInclude Include="Hooks\FrameStageNotify\FrameStageNotify.h" />
     <ClInclude Include="Hooks\Hooks.h" />
+    <ClInclude Include="Hooks\LevelInit\LevelInit.h" />
     <ClInclude Include="Hooks\LockCursor\LockCursor.h" />
     <ClInclude Include="Hooks\OnScreenSizeChanged\OnScreenSizeChanged.h" />
     <ClInclude Include="Hooks\OverrideView\OverrideView.h" />

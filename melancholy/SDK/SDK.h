@@ -193,8 +193,9 @@ extern MatHelper_t gMatHelper;
 
 
 struct LocalInfo_t {
-	bool CanHeadShot = false;
-	int CurrentTargetIndex = 0;
+	bool CanHeadShot		= false;
+	int CurrentTargetIndex	= 0;
+	bool LevelInitialized	= false;
 };
 
 extern LocalInfo_t gLocalInfo;

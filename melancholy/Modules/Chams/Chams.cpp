@@ -46,7 +46,7 @@ void CChams::Run()
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
-	if (!pLocal)
+	if (!pLocal || pLocal->GetTeamNum() < 2)
 		return;
 
 	for (int n = 1; n < gInts.EntityList->GetHighestEntityIndex(); n++)

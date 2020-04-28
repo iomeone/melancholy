@@ -327,12 +327,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		|| !gInts.Engine->IsConnected()
 		|| !gInts.Engine->IsInGame()
 		|| gInts.Engine->Con_IsVisible())
-	{
-		if (!Targets.empty())
-			Targets.clear();
-
 		return;
-	}
 
 	if (!AimMelee && pLocalWeapon->GetSlot() == 2)
 		return;

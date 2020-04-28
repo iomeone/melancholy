@@ -11,6 +11,7 @@
 #include "RunCommand/RunCommand.h"
 #include "FrameStageNotify/FrameStageNotify.h"
 #include "OnScreenSizeChanged/OnScreenSizeChanged.h"
+#include "LevelInit/LevelInit.h"
 
 struct Hooks_t
 {

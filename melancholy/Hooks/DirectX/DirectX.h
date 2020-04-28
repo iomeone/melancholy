@@ -1,8 +1,7 @@
 #pragma once
 #include "../../Modules/Menu/Menu.h"
 
-namespace DirectX
-{
+namespace DirectX {
 	const int EndSceneIndex = 42;
 	const int ResetIndex = 16;
 

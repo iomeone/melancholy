@@ -46,6 +46,9 @@ bool CESP::GetEntities(CBaseEntity *pLocal)
 
 bool CESP::GetEntityBoundsW2S(ESPEnt_t &ent, int &x_out, int &y_out, int &w_out, int &h_out)
 {
+	if (!gInts.GameMovement || !ent.ptr || ent.type == ESPEntType_t::DEFAULT)
+		return false;
+
 	const matrix3x4 &transform = ent.ptr->GetRgflCoordinateFrame();
 
 	Vec3 mins = Vec3();
@@ -59,7 +62,8 @@ bool CESP::GetEntityBoundsW2S(ESPEnt_t &ent, int &x_out, int &y_out, int &w_out,
 			break;
 		}
 
-		default: {
+		case ESPEntType_t::BUILDING:
+		case ESPEntType_t::PICKUP: {
 			mins = ent.ptr->GetCollideableMins();
 			maxs = ent.ptr->GetCollideableMaxs();
 			break;
@@ -181,24 +185,13 @@ void CESP::Run()
 		}
 	}
 
-	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame()) {
-		if (!Entities.empty())
-			Entities.clear();
-
-		return;
-	}
-
-	if (gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
+	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
-	if (!pLocal || !Active) {
-		if (!Entities.empty())
-			Entities.clear();
-
+	if (!pLocal || pLocal->GetTeamNum() < 2 || !Active)
 		return;
-	}
 
 	if (GetEntities(pLocal))
 	{

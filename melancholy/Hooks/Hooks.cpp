@@ -59,6 +59,9 @@ void Hooks_t::Initialize()
 		ClientHook = new VMTBaseManager();
 		ClientHook->Init(gInts.Client);
 		ClientHook->HookMethod(&FrameStageNotify::Hook, FrameStageNotify::Index);
+		ClientHook->HookMethod(&LevelInit::LevelInitPreEntity, LevelInit::PreIndex);
+		ClientHook->HookMethod(&LevelInit::LevelInitPostEntity, LevelInit::PostIndex);
+		ClientHook->HookMethod(&LevelInit::LevelShutdown, LevelInit::ShutdownIndex);
 		ClientHook->Rehook();
 	}
 

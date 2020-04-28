@@ -7,8 +7,7 @@
 #include "../Misc/Misc.h"
 #include "../Glow/Glow.h"
 
-class CMenu
-{
+class CMenu {
 private:
 	const int windowX = 400;
 	const int windowY = 200;
@@ -19,13 +18,6 @@ private:
 		| ImGuiWindowFlags_NoScrollbar
 		| ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_NoSavedSettings);
-
-	struct Spectator_t {
-		std::string name = "";
-		std::string mode = "";
-	};
-
-	std::vector<Spectator_t> Spectators;
 
 public:
 	bool bOpen = false;

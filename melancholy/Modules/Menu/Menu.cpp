@@ -85,7 +85,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	if (bOpen)
+	if (bOpen && !gInts.Engine->IsDrawingLoadingImage())
 	{
 		if (ImGui::Begin(windowTitle, nullptr, windowFlags))
 		{
@@ -519,87 +519,6 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 				ImGui::EndTabBar();
 			}
 			
-			ImGui::End();
-		}
-	}
-
-	if (gESP.SpectatorList 
-		&& gESP.Active
-		&& gInts.Engine->IsInGame()
-		&& gInts.Engine->IsConnected()
-		&& !gInts.Engine->Con_IsVisible()
-		&& !gInts.EngineVGui->IsGameUIVisible())
-	{
-		//maybe moving this here will fix the ghost spectators?
-		if (!Spectators.empty())
-			Spectators.clear();
-
-		CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
-
-		if (pLocal && pLocal->IsAlive())
-		{
-			for (int n = 0; n < (gInts.Engine->GetMaxClients() + 1); n++)
-			{
-				CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
-
-				if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
-					continue;
-
-				PlayerInfo_t info;
-
-				if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &info))
-					continue;
-
-				CBaseEntity *obs_target = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
-
-				if (!obs_target || obs_target->GetIndex() != pLocal->GetIndex() || !obs_target->IsAlive())
-					continue;
-
-				auto GetMode = [&](CBaseEntity *ent) -> std::string {
-					switch (ent->GetObserverMode()) {
-						case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
-						case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
-						default: return std::string();
-					}
-				};
-
-				std::string mode = GetMode(ent);
-
-				if (mode.empty())
-					continue;
-
-				Spectators.push_back({ info.name, mode });
-			}
-		}
-
-		std::string title = std::string("spectators (" + std::to_string(Spectators.size()) + ")###");
-
-		if (ImGui::Begin(title.c_str(), nullptr, windowFlags))
-		{
-			ImGui::SetWindowSize(ImVec2(200.0f, (45.0f + ((ImGui::GetFontSize() + 5.0f) * Spectators.size()))));
-			ImGui::Columns(2);
-
-			ImGui::Text("name");
-			ImGui::NextColumn();
-			ImGui::SetColumnOffset(ImGui::GetColumnIndex(), (ImGui::GetWindowWidth() / 2.0f));
-			ImGui::Text("mode");
-
-			if (Spectators.size() > 0) {
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
-				ImGui::Separator();
-			}
-			
-			for (size_t n = 0; n < Spectators.size(); n++)
-			{
-				ImGui::NextColumn();
-				ImGui::Text(Spectators.at(n).name.c_str());
-				ImGui::NextColumn();
-				ImGui::Text(Spectators.at(n).mode.c_str());
-				
-				if (n < (Spectators.size() - 1))
-					ImGui::Separator();
-			}
-
 			ImGui::End();
 		}
 	}

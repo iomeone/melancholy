@@ -5,7 +5,7 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 	//main glow handling
 	if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
 	{
-		if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame())
+		if (!Active || !gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || pLocal->GetTeamNum() < 2)
 			return;
 
 		for (int n = 1; n < gInts.EntityList->GetHighestEntityIndex(); n++) {
@@ -31,7 +31,7 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 			if (GlowObject.m_nNextFreeSlot != ENTRY_IN_USE)
 				continue;
 
-			if (!Active) {
+			if (!Active || pLocal->GetTeamNum() < 2) {
 				GlowObject.m_flGlowAlpha = 0.0f; //kind of ghetto to handle it like this
 				continue;
 			}
