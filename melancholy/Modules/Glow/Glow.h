@@ -6,7 +6,7 @@ public:
 	bool Active = false;
 	float GlowAlpha = 0.9f;
 
-	int PlayerGlow				= 1; //0 off 1 team 2 health
+	int PlayerGlow				= 1; //0 off 1 team 2 health 3 caramelldansen
 	bool NoTeammatePlayers		= true;
 
 	int BuildingGlow			= 1;

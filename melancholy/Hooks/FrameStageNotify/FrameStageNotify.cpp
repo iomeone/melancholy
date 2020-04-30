@@ -45,5 +45,10 @@ void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t
 	if (frame == FRAME_RENDER_START)
 		ThirdpersonDrawFix(pLocal);
 
+	if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
+		if (gESP.NoPunch && pLocal->IsAlive()) //dynvars be like no can do
+			*reinterpret_cast<Vec3 *>(pLocal + 0xE8C) = Vec3(0.0f, 0.0f, 0.0f);
+	}
+
 	gGlow.Run(pLocal, frame);
 }

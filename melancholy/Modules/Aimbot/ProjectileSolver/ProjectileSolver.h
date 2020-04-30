@@ -4,7 +4,6 @@
 struct ProjectileInfo_t {
 	float speed		= 0.0f;
 	float gravity	= 0.0f;
-	bool is_pipe	= false;
 };
 
 class CProjectileWeapon {
@@ -29,11 +28,9 @@ public:
 };
 
 struct Solution_t {
-	float pitch				= 0.0f;
-	float yaw				= 0.0f;
-	float time				= 0.0f;
-	bool ray_hit_ground		= false;
-	bool ray_hit_ceiling	= false;
+	float pitch	= 0.0f;
+	float yaw	= 0.0f;
+	float time	= 0.0f;
 };
 
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground);

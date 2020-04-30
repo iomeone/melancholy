@@ -49,6 +49,7 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 					case 0: { GlowCol = Vec3(); break; }
 					case 1: { GlowCol = Utils::GetTeamColor(GlowEnt->GetTeamNum()).V3(); break; }
 					case 2: { GlowCol = Utils::GetHealthColor(GlowEnt->GetHealth(), GlowEnt->GetMaxHealth()).V3(); break; }
+					case 3: { GlowCol = Utils::Rainbow().V3(); break; }
 				}
 			}
 			
@@ -62,6 +63,7 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 						case 0: { GlowCol = Vec3(); break; }
 						case 1: { GlowCol = Utils::GetTeamColor(obj->GetTeamNum()).V3(); break; }
 						case 2: { GlowCol = Utils::GetHealthColor(obj->GetHealth(), obj->GetMaxHealth()).V3(); break; }
+						case 3: { GlowCol = Utils::Rainbow().V3(); break; }
 					}
 				}
 			}

@@ -196,6 +196,8 @@ struct LocalInfo_t {
 	bool CanHeadShot		= false;
 	int CurrentTargetIndex	= 0;
 	bool LevelInitialized	= false;
+
+	Vec3 PredStart = Vec3(), PredEnd = Vec3();
 };
 
 extern LocalInfo_t gLocalInfo;

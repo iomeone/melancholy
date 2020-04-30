@@ -16,6 +16,7 @@ private:
 	std::vector<Target_t> Targets;
 
 	Target_t GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd);
+	bool CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd, Target_t &target);
 	int GetAimHitbox(CBaseEntity *pLocal, CBaseCombatWeapon *wep);
 	bool IsAimKeyDown();
 	void SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd);
@@ -24,19 +25,18 @@ private:
 
 public:
 	//main
-	bool Active			= false;
+	bool Active			= true;
 	bool ProjectileAim	= false;
 	bool Silent			= false;
 	bool Autoshoot		= false;
 	int AimKey			= 0; //0 lshift 1 lbutton
 	float AimFov		= 45.0f;
-	float AimTime		= 0.0f;
 
 	//hitscan
 	bool WaitForHS	= true;
 	bool ScopedOnly = false;
-	bool Multipoint = false;
-	bool Hitscan	= false;
+	bool Multipoint = true;
+	bool Hitscan	= true;
 
 	//melee
 	bool AimMelee		= true;
@@ -49,6 +49,15 @@ public:
 	bool IgnoreCloaked		= false;
 	bool IgnoreTaunting		= true;
 	bool RemoveDisguise		= false;
+
+	//buildings
+	bool AimSentry				= true;
+	bool AimDispenser			= true;
+	bool AimTeleporter			= true;
+
+	//smoothing
+	float AimTime	= 0.0f;
+	int AimMethod	= 0;	//0 time 1 ease
 
 	void Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd);
 };

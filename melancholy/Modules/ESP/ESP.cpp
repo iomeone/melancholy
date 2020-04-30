@@ -12,21 +12,24 @@ bool CESP::GetEntities(CBaseEntity *pLocal)
 		if (!ent || ent == pLocal || ent->IsDormant() || !ent->IsAlive())
 			continue;
 
-		if (ent->IsPlayer()) {
+		if (ent->IsPlayer())
+		{
 			if (!Players || NoTeammatePlayers && ent->GetTeamNum() == pLocal->GetTeamNum() || IgnoreCloaked && ent->IsCloaked())
 				continue;
 
 			Entities.push_back({ ESPEntType_t::PLAYER, ent, ent->GetAbsOrigin().DistTo(pLocal->GetAbsOrigin()) });
 		}
 
-		else if (ent->IsBuilding()) {
+		else if (ent->IsBuilding())
+		{
 			if (!Buildings || NoTeammateBuildings && ent->GetTeamNum() == pLocal->GetTeamNum())
 				continue;
 
 			Entities.push_back({ ESPEntType_t::BUILDING, ent, ent->GetAbsOrigin().DistTo(pLocal->GetAbsOrigin()) });
 		}
 
-		else if (ent->IsPickup()) {
+		else if (ent->IsPickup())
+		{
 			if (!Pickups || !PickupName) //remove !PickupName if more stuff related to pickups is added.
 				continue;
 
@@ -38,7 +41,7 @@ bool CESP::GetEntities(CBaseEntity *pLocal)
 		return false;
 
 	std::sort(Entities.begin(), Entities.end(), [&](const ESPEnt_t &a, const ESPEnt_t &b) -> bool {
-		return (a.dist > b.dist); //drawing order
+		return (a.dist > b.dist); //https://en.wikipedia.org/wiki/Painter%27s_algorithm
 	});
 
 	return true;
@@ -172,25 +175,34 @@ RGBA_t CESP::GetEntityColor(ESPEnt_t &ent)
 	return out;
 }
 
-void CESP::Run()
+void CESP::Run(CBaseEntity *pLocal)
 {
+	std::vector<std::pair<std::string, std::string>> spectators;
+
+	if (!spectators.empty())
+		spectators.clear();
+
 	{
 		static bool font_init = false;
 
-		if (!font_init) {
-			Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-			DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
-			DrawMark = Draw_t("Arial", 16, 0, FONTFLAG_OUTLINE);
+		if (!font_init)
+		{
+			Draw		= Draw_t("Arial",				FontTall,		0, FONTFLAG_OUTLINE);
+			DrawSmall	= Draw_t("Smallest Pixel-7",	FontTallSmall,	0, FONTFLAG_OUTLINE);
+			DrawSpec	= Draw_t("Arial",				FontTallSpec,	0, FONTFLAG_OUTLINE);
+			DrawMark	= Draw_t("Arial",				16,				0, FONTFLAG_OUTLINE);
+
 			font_init = true;
 		}
 	}
 
-	if (!gInts.Engine->IsConnected() || !gInts.Engine->IsInGame() || gInts.Engine->Con_IsVisible() || gInts.EngineVGui->IsGameUIVisible())
-		return;
-
-	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
-
-	if (!pLocal || pLocal->GetTeamNum() < 2 || !Active)
+	if (!pLocal
+		|| (pLocal->GetTeamNum() < 2)
+		|| !Active
+		|| !gInts.Engine->IsConnected()
+		|| !gInts.Engine->IsInGame()
+		|| gInts.Engine->Con_IsVisible()
+		|| gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	if (GetEntities(pLocal))
@@ -206,7 +218,7 @@ void CESP::Run()
 			static int healthbar_offset = 2;
 			int text_x					= ((x + w) + 2);
 			int text_y					= y;
-			int text_offset				= 0; //updated after each text draw
+			int text_offset				= 0;
 
 			RGBA_t col = GetEntityColor(v);
 
@@ -511,12 +523,78 @@ void CESP::Run()
 			}
 		}
 	}
+
+	if (!gLocalInfo.PredStart.IsZero())
+	{
+		Vec3 Start2D, End2D;
+
+		if (Math::W2S(gLocalInfo.PredStart, Start2D) && Math::W2S(gLocalInfo.PredEnd, End2D)) {
+			Draw.Line(Start2D.x, Start2D.y, End2D.x, End2D.y, ColGreen);
+			Draw.Rect((End2D.x - 4), (End2D.y - 4), 8, 8, ColGreen);
+		}
+	}
+
+	if (pLocal->IsAlive() && SpectatorList)
+	{
+		//add the spectators to the vector
+		for (int n = 1; n < (gInts.Engine->GetMaxClients() + 1); n++)
+		{
+			CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
+
+			if (!ent || ent == pLocal || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
+				continue;
+
+			CBaseEntity *observed_player = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
+
+			if (!observed_player || !observed_player->IsAlive() || observed_player != pLocal)
+				continue;
+
+			PlayerInfo_t playerInfo;
+
+			if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &playerInfo))
+				continue;
+
+			auto get_mode = [&](CBaseEntity *player) -> std::string {
+				switch (player->GetObserverMode()) {
+					case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
+					case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
+					default: { return std::string(); }
+				}
+			};
+
+			std::string mode = get_mode(ent);
+
+			if (mode.empty())
+				continue;
+
+			spectators.push_back({ playerInfo.name, mode });
+		}
+
+		if (spectators.empty())
+			return;
+
+		//draw the spectators
+		for (size_t n = 0; n < spectators.size(); n++)
+		{
+			std::string s = std::string(spectators.at(n).first + " - " + spectators.at(n).second);
+
+			int w = 0, h = 0;
+			gInts.Surface->GetTextSize(DrawSpec.dwFont, Utils::ToWC(s.c_str()), w, h);
+
+			int x = ((gScreenSize.w / 2) - (w / 2));
+			int y = (((gScreenSize.h / 2) + 25) + (FontTallSpec * n));
+
+			DrawSpec.String(x, y, ColSpec, s.c_str());
+		}
+	}
 }
 
-void CESP::ReloadFonts() {
-	Draw = Draw_t("Arial", FontTall, 0, FONTFLAG_OUTLINE);
-	DrawSmall = Draw_t("Smallest Pixel-7", FontTallSmall, 0, FONTFLAG_OUTLINE);
-	DrawMark = Draw_t("Arial", 16, 0, FONTFLAG_OUTLINE);
+void CESP::ReloadFonts()
+{
+	Draw		= Draw_t("Arial",				FontTall,		0, FONTFLAG_OUTLINE);
+	DrawSmall	= Draw_t("Smallest Pixel-7",	FontTallSmall,	0, FONTFLAG_OUTLINE);
+	DrawSpec	= Draw_t("Arial",				FontTallSpec,	0, FONTFLAG_OUTLINE);
+	DrawMark	= Draw_t("Arial",				16,				0, FONTFLAG_OUTLINE);
 }
 
 CESP gESP;

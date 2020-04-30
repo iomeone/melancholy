@@ -56,12 +56,17 @@ void CChams::Run()
 		if (!ent || ent == pLocal || !ent->IsAlive() || ent->IsDormant())
 			continue;
 
-		RGBA_t col = Utils::GetTeamColor(ent->GetTeamNum());
-
 		if (ent->IsPlayer())
 		{
 			if (PlayerChams && (NoTeammatePlayers ? ent->GetTeamNum() != pLocal->GetTeamNum() : true))
 			{
+				RGBA_t color = RGBA_t();
+				switch (PlayerChamsColor) {
+					case 0: { color = Utils::GetTeamColor(ent->GetTeamNum()); break; }
+					case 1: { color = Utils::GetHealthColor(ent->GetHealth(), ent->GetMaxHealth()); break; }
+					case 2: { color = Utils::Rainbow(); break; }
+				}
+
 				IMaterial *mat = nullptr;
 				switch (PlayerChams) {
 					case 1: { mat = gMatHelper.shaded; break; }
@@ -76,7 +81,7 @@ void CChams::Run()
 					case 2: { mode = ChamMode_t::ALWAYS; break; }
 				}
 
-				cham(ent, mat, col, mode);
+				cham(ent, mat, color, mode);
 
 				if (PlayerWeapons) {
 					CBaseCombatWeapon *weapon = ent->GetActiveWeapon();
@@ -93,6 +98,18 @@ void CChams::Run()
 		{
 			if (BuildingChams && (NoTeammateBuildings ? ent->GetTeamNum() != pLocal->GetTeamNum() : true))
 			{
+				CObject *obj = reinterpret_cast<CObject *>(ent);
+
+				if (!obj)
+					continue;
+
+				RGBA_t color = RGBA_t();
+				switch (BuildingChamsColor) {
+					case 0: { color = Utils::GetTeamColor(ent->GetTeamNum()); break; }
+					case 1: { color = Utils::GetHealthColor(obj->GetHealth(), obj->GetMaxHealth()); break; }
+					case 2: { color = Utils::Rainbow(); break; }
+				}
+
 				IMaterial *mat = nullptr;
 				switch (BuildingChams) {
 					case 1: { mat = gMatHelper.shaded; break; }
@@ -107,7 +124,7 @@ void CChams::Run()
 					case 2: { mode = ChamMode_t::ALWAYS; break; }
 				}
 
-				cham(ent, mat, col, mode);
+				cham(ent, mat, color, mode);
 			}
 		}
 
@@ -115,6 +132,12 @@ void CChams::Run()
 		{
 			if (PickupChams)
 			{
+				RGBA_t color = RGBA_t();
+				switch (PickupChamsColor) {
+					case 0: { color = Utils::GetPickupColor(ent); break; }
+					case 1: { color = Utils::Rainbow(); break; }
+				}
+
 				IMaterial *mat = nullptr;
 				switch (PickupChams) {
 					case 1: { mat = gMatHelper.shaded; break; }
@@ -129,8 +152,7 @@ void CChams::Run()
 					case 2: { mode = ChamMode_t::ALWAYS; break; }
 				}
 
-				RGBA_t col = Utils::GetPickupColor(ent);
-				cham(ent, mat, col, mode);
+				cham(ent, mat, color, mode);
 			}
 		}
 
@@ -141,10 +163,15 @@ void CChams::Run()
 			if (!owner || owner == pLocal)
 				continue;
 
-			RGBA_t col = Utils::GetTeamColor(owner->GetTeamNum());
-
 			if (PlayerChams && (NoTeammatePlayers ? owner->GetTeamNum() != pLocal->GetTeamNum() : true) && PlayerCosmetics)
 			{
+				RGBA_t color = RGBA_t();
+				switch (PlayerChamsColor) {
+					case 0: { color = Utils::GetTeamColor(owner->GetTeamNum()); break; }
+					case 1: { color = Utils::GetHealthColor(owner->GetHealth(), owner->GetMaxHealth()); break; }
+					case 2: { color = Utils::Rainbow(); break; }
+				}
+
 				IMaterial *mat = nullptr;
 				switch (PlayerChams) {
 					case 1: { mat = gMatHelper.shaded; break; }
@@ -159,7 +186,7 @@ void CChams::Run()
 					case 2: { mode = ChamMode_t::ALWAYS; break; }
 				}
 
-				cham(ent, mat, col, mode);
+				cham(ent, mat, color, mode);
 			}
 		}
 	}

@@ -14,13 +14,14 @@ struct ESPEnt_t {
 	float dist = FLT_MAX;
 };
 
-class CESP
-{
+class CESP {
 private:
 	const int FontTall = 12;
 	const int FontTallSmall = 11;
+	const int FontTallSpec = 14;
 	Draw_t Draw;
 	Draw_t DrawSmall;
+	Draw_t DrawSpec;
 
 private:
 	std::vector<ESPEnt_t> Entities;
@@ -35,9 +36,10 @@ public:
 	RGBA_t ColWhite		{ 255, 255, 255, 255 };
 	RGBA_t ColGreen		{ 0, 255, 0, 255 };
 	RGBA_t ColOutline	{ 0, 0, 0, 200 };
+	RGBA_t ColSpec		{ 255, 80, 80, 255 };
 
 	//-------------------------------------------------- main
-	bool Active		= false;
+	bool Active		= true;
 	bool Players	= true;
 	bool Buildings	= true;
 	bool Pickups	= true;
@@ -47,6 +49,7 @@ public:
 	bool Thirdperson	= false;
 	bool NoScope		= true;
 	bool NoZoom			= true;
+	bool NoPunch		= true;
 	int CustomFOV		= 110;
 
 	//-------------------------------------------------- players
@@ -77,7 +80,8 @@ public:
 	//--------------------------------------------------
 
 	Draw_t DrawMark;
-	void Run();
+
+	void Run(CBaseEntity *pLocal);
 	void ReloadFonts();
 };
 

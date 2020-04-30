@@ -103,12 +103,13 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 				if (ImGui::BeginTabItem("aimbot"))
 				{
-					static const char *szKeys[]		= { "lshift", "lbutton" };
-					static const char *szHitbox[]	= { "head", "body", "auto" };
+					static const char *szKeys[]			= { "lshift", "lbutton" };
+					static const char *szHitbox[]		= { "head", "body", "auto" };
+					static const char *szSmoothing[]	= { "time", "ease" };
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.5f), true))
+					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 					{
 						ImGui::Text("main");
 						ImGui::PushItemWidth(90.0f);
@@ -128,7 +129,6 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Checkbox		("autoshoot",			&gAimbot.Autoshoot);
 						ImGui::Combo		("key",					&gAimbot.AimKey, szKeys, IM_ARRAYSIZE(szKeys));
 						ImGui::InputFloat	("fov",					&gAimbot.AimFov, 1.0f, 1.0f, 0);
-						ImGui::SliderFloat	("aim time",			&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
 						
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -136,7 +136,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SameLine();
 
-					if (ImGui::BeginChild("hitscan_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.5f), true))
+					if (ImGui::BeginChild("hitscan_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 					{
 						ImGui::Text("hitscan");
 						ImGui::PushItemWidth(90.0f);
@@ -156,7 +156,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SameLine();
 
-					if (ImGui::BeginChild("melee_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.5f), true))
+					if (ImGui::BeginChild("melee_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 					{
 						ImGui::Text("melee");
 						ImGui::PushItemWidth(90.0f);
@@ -181,7 +181,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-					if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, 0.0f), true))
+					if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.5f), true))
 					{
 						ImGui::Text("players");
 						ImGui::PushItemWidth(90.0f);
@@ -194,6 +194,43 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Checkbox	("ignore cloaked",	&gAimbot.IgnoreCloaked);
 						ImGui::Checkbox	("ignore taunting",	&gAimbot.IgnoreTaunting);
 						ImGui::Checkbox	("remove disguise",	&gAimbot.RemoveDisguise);
+
+						ImGui::PopItemWidth();
+						ImGui::EndChild();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.5f), true))
+					{
+						ImGui::Text("buildings");
+						ImGui::PushItemWidth(90.0f);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Checkbox("aim sentrygun",	&gAimbot.AimSentry);
+						ImGui::Checkbox("aim dispenser",	&gAimbot.AimDispenser);
+						ImGui::Checkbox("aim teleporter",	&gAimbot.AimTeleporter);
+
+						ImGui::PopItemWidth();
+						ImGui::EndChild();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::BeginChild("smoothing_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.5f), true))
+					{
+						ImGui::Text("smoothing");
+						ImGui::PushItemWidth(90.0f);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::SliderFloat	("time",	&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
+						ImGui::Combo		("method",	&gAimbot.AimMethod, szSmoothing, IM_ARRAYSIZE(szSmoothing));
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -234,22 +271,16 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SameLine();
 
-					if (ImGui::BeginChild("local_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
+					if (ImGui::BeginChild("local_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 9.0f), true))
 					{
 						ImGui::Text("local");
-						ImGui::PushItemWidth(90.0f);
 
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
 						ImGui::Checkbox("spectator list",	&gESP.SpectatorList);
-						ImGui::Checkbox("thirdperson",		&gESP.Thirdperson);
-						ImGui::Checkbox("remove scope",		&gESP.NoScope);
-						ImGui::Checkbox("remove zoom",		&gESP.NoZoom);
-						ImGui::InputInt("fov override",		&gESP.CustomFOV);
 
-						ImGui::PopItemWidth();
 						ImGui::EndChild();
 					}
 
@@ -339,10 +370,33 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 				{
 					if (ImGui::BeginTabBar("visuals_tabs", ImGuiTabBarFlags_NoTooltip))
 					{
+						if (ImGui::BeginTabItem("local"))
+						{
+							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+
+							if (ImGui::BeginChild("local_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
+							{
+								ImGui::PushItemWidth(90.0f);
+
+								ImGui::Checkbox("thirdperson",	&gESP.Thirdperson);
+								ImGui::Checkbox("remove scope",	&gESP.NoScope);
+								ImGui::Checkbox("remove zoom",	&gESP.NoZoom);
+								ImGui::Checkbox("remove punch",	&gESP.NoPunch);
+								ImGui::InputInt("fov",			&gESP.CustomFOV);
+
+								ImGui::PopItemWidth();
+								ImGui::EndChild();
+							}
+
+							ImGui::EndTabItem();
+						}
+
 						if (ImGui::BeginTabItem("chams"))
 						{
-							static const char *szChams[] = { "off", "shaded", "flat", "wireframe" };
-							static const char *szChamsMode[] = { "visible", "invisible", "always" };
+							static const char *szChams[]		= { "off", "shaded", "flat", "wireframe" };
+							static const char *szChamsMode[]	= { "visible", "invisible", "always" };
+							static const char *szChamColor[]	= { "team", "health", "caramelldansen" };
+							static const char *szChamClrPkup[]	= { "pickup", "caramelldansen" };
 
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
@@ -362,7 +416,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 							{
 								ImGui::Text("players");
 								ImGui::PushItemWidth(90.0f);
@@ -372,15 +426,16 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
 								ImGui::Checkbox("no teammates", &gChams.NoTeammatePlayers);
-								ImGui::Checkbox("cosmetics", &gChams.PlayerCosmetics);
-								ImGui::Checkbox("weapons", &gChams.PlayerWeapons);
+								ImGui::Checkbox("cosmetics",	&gChams.PlayerCosmetics);
+								ImGui::Checkbox("weapons",		&gChams.PlayerWeapons);
 
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 								ImGui::Separator();
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-								ImGui::Combo("type", &gChams.PlayerChams, szChams, IM_ARRAYSIZE(szChams));
-								ImGui::Combo("mode", &gChams.PlayerChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("type",	&gChams.PlayerChams,		szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode",	&gChams.PlayerChamsMode,	szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("color",	&gChams.PlayerChamsColor,	szChamColor, IM_ARRAYSIZE(szChamColor));
 
 								ImGui::PopItemWidth();
 								ImGui::EndChild();
@@ -403,8 +458,9 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 								ImGui::Separator();
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-								ImGui::Combo("type", &gChams.BuildingChams, szChams, IM_ARRAYSIZE(szChams));
-								ImGui::Combo("mode", &gChams.BuildingChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("type",	&gChams.BuildingChams,		szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode",	&gChams.BuildingChamsMode,	szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("color",	&gChams.BuildingChamsColor, szChamColor, IM_ARRAYSIZE(szChamColor));
 
 								ImGui::PopItemWidth();
 								ImGui::EndChild();
@@ -421,8 +477,9 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 								ImGui::Separator();
 								ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-								ImGui::Combo("type", &gChams.PickupChams, szChams, IM_ARRAYSIZE(szChams));
-								ImGui::Combo("mode", &gChams.PickupChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("type",	&gChams.PickupChams, szChams, IM_ARRAYSIZE(szChams));
+								ImGui::Combo("mode",	&gChams.PickupChamsMode, szChamsMode, IM_ARRAYSIZE(szChamsMode));
+								ImGui::Combo("color",	&gChams.PickupChamsColor, szChamClrPkup, IM_ARRAYSIZE(szChamClrPkup));
 
 								ImGui::PopItemWidth();
 								ImGui::EndChild();
@@ -433,7 +490,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 						if (ImGui::BeginTabItem("glow"))
 						{
-							static const char *szGlow[] = { "off", "team", "health" };
+							static const char *szGlow[] = { "off", "team", "health", "caramelldansen" };
 
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
@@ -453,7 +510,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							if (ImGui::BeginChild("player_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.5f), true))
 							{
 								ImGui::Text("players");
 								ImGui::PushItemWidth(90.0f);
@@ -471,7 +528,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 							ImGui::SameLine();
 
-							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.5f), true))
 							{
 								ImGui::Text("buildings");
 								ImGui::PushItemWidth(90.0f);

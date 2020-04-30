@@ -42,8 +42,9 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 		if (local && local->IsAlive())
 			local->ForceTauntCam(gESP.Active && gESP.Thirdperson);
 
-		gESP.Run();
+		gESP.Run(local);
 
+		//why does this go apeshit in debug mode, aimbot too
 		if (!gInts.Engine->IsConnected() && !gInts.Engine->IsDrawingLoadingImage()) 
 		{
 			gInts.Panels->SetTopmostPopup(vgui_panel, true);

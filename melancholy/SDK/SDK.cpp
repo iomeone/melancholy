@@ -2,8 +2,7 @@
 
 //-------------------------------------------------- CBaseEntity
 
-Vec3 CBaseEntity::GetViewOffset()
-{
+Vec3 CBaseEntity::GetViewOffset() {
 	DYNVAR_RETURN(Vec3, this, "DT_BasePlayer", "localdata", "m_vecViewOffset[0]");
 }
 
