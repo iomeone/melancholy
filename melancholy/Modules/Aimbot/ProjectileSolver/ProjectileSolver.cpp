@@ -72,7 +72,7 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 		case Demoman_m_TopShelf:
 		case Demoman_m_Warhawk:
 		case Demoman_m_ButcherBird: {
-			out = { 1200.0f, 0.4f }; //1216.6f in the wiki, 1200.0f in the game code :thinking:
+			out = { 1217.0f, 0.4f }; //1216.6f in the wiki, 1200.0f in the game code :thinking:
 			break;
 		}
 
@@ -145,7 +145,8 @@ Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, c
 
 //-------------------------------------------------- Solver
 
-bool Optimal(float x, float y, float v0, float g, float &pitch) {
+bool Optimal(float x, float y, float v0, float g, float &pitch)
+{
 	const float root = v0 * v0 * v0 * v0 - g * (g * x * x + 2.0f * y * v0 * v0);
 
 	if (root < 0.0f) //if it's negative there are no solutions
@@ -155,13 +156,15 @@ bool Optimal(float x, float y, float v0, float g, float &pitch) {
 	return true;
 }
 
-bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &target, Solution_t &sol) {
+bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &target, Solution_t &sol)
+{
 	const Vec3 v	= (target - origin);
 	const float dx	= sqrt(v.x * v.x + v.y * v.y);
 	const float v0	= weapon.GetWeaponInfo().speed;
 	const float g	= (800.0f * weapon.GetWeaponInfo().gravity);
 
-	if (g > 0.0f) {
+	if (g > 0.0f) 
+	{
 		const float dy = v.z;
 
 		if (!Optimal(dx, dy, v0, g, sol.pitch))
@@ -170,7 +173,8 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 		sol.yaw = atan2(v.y, v.x);
 	}
 	
-	else {
+	else
+	{
 		Vec3 ang = Math::CalcAngle(origin, target);
 		sol.pitch = -DEG2RAD(ang.x);
 		sol.yaw = DEG2RAD(ang.y);
@@ -182,35 +186,30 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
 {
-	static const float MAX_TIME = 1.25f;
-	static const float TIME_STEP = 1.0f / 256.0f;
+	static const float MAX_TIME = 1.5f;
+	static const float TIME_STEP = (MAX_TIME / 256.0f);
+
+	Ray_t ray;
+	CGameTrace trace;
+	CTraceFilterNoPlayers filter;
+	filter.pSkip = target.ptr;
 
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
 	{
 		Vec3 predicted_pos = target.PredictPosition(target_time, target.origin, target.velocity, target.gravity, on_ground);
 
-		{
-			Ray_t ray;
-			ray.Init(target.origin, predicted_pos);
-			CTraceFilter filter;
-			filter.pSkip = target.ptr;
-			CGameTrace trace;
-			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
+		ray.Init(target.origin, predicted_pos);
+		gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
-			if (trace.DidHit()) {
-				predicted_pos.z = (trace.endpos.z + target.ptr->GetViewOffset().z);
-			}
-		}
+		if (trace.DidHit())
+			predicted_pos.z = (trace.endpos.z + target.ptr->GetViewOffset().z);
 
 		if (!Solve2D(origin, weapon, predicted_pos, sol))
 			return false;
 
-		if (sol.time < target_time) {
-			Ray_t ray;
+		if (sol.time < target_time)
+		{
 			ray.Init(predicted_pos, origin);
-			CTraceFilter filter;
-			filter.pSkip = target.ptr;
-			CGameTrace trace;
 			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
 			if (trace.fraction < 0.99f)

@@ -539,20 +539,42 @@ bool CTraceFilter::ShouldHitEntity(void *pEntityHandle, int nContentsMask)
 {
 	CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pEntityHandle);
 
-	switch (pEntity->GetClientClass()->iClassID) {
+	switch (pEntity->GetClientClass()->iClassID)
+	{
+		case 55:
+		case 64:
+		case 117:
+		case 225: {
+			return false;
+		}
+	}
+
+	return !(pEntityHandle == pSkip);
+}
+
+TraceType_t CTraceFilter::GetTraceType() const {
+	return TRACE_EVERYTHING;
+}
+
+bool CTraceFilterNoPlayers::ShouldHitEntity(void *pEntityHandle, int nContentsMask)
+{
+	CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pEntityHandle);
+
+	switch (pEntity->GetClientClass()->iClassID)
+	{
 		case 55:
 		case 64:
 		case 117:
 		case 225:
+		case CTFPlayer: {
 			return false;
+		}
 	}
 
 	return !(pEntityHandle == pSkip);
-
-	return true;
 }
 
-TraceType_t CTraceFilter::GetTraceType() const {
+TraceType_t CTraceFilterNoPlayers::GetTraceType() const {
 	return TRACE_EVERYTHING;
 }
 

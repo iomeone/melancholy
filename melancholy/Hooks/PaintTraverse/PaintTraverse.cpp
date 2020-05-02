@@ -50,7 +50,7 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 			gInts.Panels->SetTopmostPopup(vgui_panel, true);
 
 			static std::string msg0 = "melancholy by spook953";
-			static std::string msg1 = ("build date " + std::string(__DATE__));
+			static std::string msg1 = ("UC Release");
 
 			RGBA_t col = Utils::Rainbow();
 			static int w = 0, h = 0;

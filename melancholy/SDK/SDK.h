@@ -113,8 +113,15 @@ public:
 };
 
 
-class CTraceFilter : public ITraceFilter
-{
+class CTraceFilter : public ITraceFilter {
+public:
+	virtual bool ShouldHitEntity(void *pEntityHandle, int nContentsMask);
+	virtual TraceType_t	GetTraceType() const;
+
+	CBaseEntity *pSkip = nullptr;
+};
+
+class CTraceFilterNoPlayers : public ITraceFilter {
 public:
 	virtual bool ShouldHitEntity(void *pEntityHandle, int nContentsMask);
 	virtual TraceType_t	GetTraceType() const;

@@ -2,8 +2,8 @@
 
 Vec3 SmoothStartAngle	= Vec3();
 float SmoothStartTime	= 0.0f;
-bool AimFinished		= false;	//used for projectile autoshoot (kinda sucks)
-int OldAimPoint			= -1;		//used for reseting smoothing
+bool AimFinished		= false;	//used for projectile autoshoot
+int OldAimPoint			= -1;		//used for reseting smoothing //TODO: something somewhere isn't working
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -103,66 +103,64 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 
 bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd, Target_t &target)
 {
-	//this entire thing needs a lot of cleaning
+	bool IsTargetPlayer = target.ptr->IsPlayer();
 
-	Vec3 LocalAngles = cmd->viewangles;
+	CProjectileWeapon ProjectileWep(wep);
+	ProjectileInfo_t ProjectileInfo = ProjectileWep.GetWeaponInfo();
 
-	if (target.ptr->IsPlayer())
+	//don't we also want multipoint with projectiles :thinking:
+	//I guess not, for now
+	if (ProjectileInfo.speed > 0.0f)
 	{
-		int hitbox = GetAimHitbox(pLocal, wep);
-
-		//projectile correction
-		CProjectileWeapon ProjectileWep(wep);
-		ProjectileInfo_t ProjectileInfo = ProjectileWep.GetWeaponInfo();
-
-		if (ProjectileInfo.speed > 0.0f)
-		{
-			if (!ProjectileAim)
-				return false;
-
-			switch (pLocal->GetClassNum())
-			{
-				case TF2_Soldier: {
-					target.ent_pos.z -= 30.0f;
-					break;
-				}
-
-				case TF2_Demoman:
-				{
-					Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-					Math::AngleVectors(cmd->viewangles, &vecForward, &vecRight, &vecUp);
-					target.local_pos += ((vecForward * 16.0f) + (vecRight * 8.0f) + (vecUp * -6.0f));
-					//target.ent_pos.z -= 35.0f;
-					break;
-				}
-			}
-
-			CPredictor Predictor(target.ent_pos, target.ptr->GetVelocity(), Vec3(0.0f, 0.0f, 800.0f), target.ptr);
-			Solution_t Solution = {};
-
-			//vis checking is done inside this func
-			if (Solve(target.local_pos, ProjectileWep, Predictor, Solution, target.ptr->IsOnGround()))
-			{
-				target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
-
-				if (pLocal->GetClassNum() == TF2_Demoman) {
-					Vec3 vecForward, vecRight, vecUp;
-					Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
-					float mod = (!target.ptr->IsOnGround() && target.ptr->GetVelocity().z < 0.0f ? 200.0f : 100.0f);
-					Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * mod));
-					Math::VectorAngles(vecVelocity, target.ang_to_ent);
-				}
-
-				target.fov = Math::CalcFov(LocalAngles, target.ang_to_ent);
-				return true;
-			}
-
+		if (!ProjectileAim)
 			return false;
+
+		int local_class			 = pLocal->GetClassNum();
+		Vec3 target_velocity	 = (IsTargetPlayer ? target.ptr->GetVelocity() : Vec3(0.0f, 0.0f, 0.0f));
+		Vec3 target_acceleration = (IsTargetPlayer ? Vec3(0.0f, 0.0f, 800.0f) : Vec3(0.0f, 0.0f, 0.0f));
+		bool target_onground	 = (IsTargetPlayer ? target.ptr->IsOnGround() : true);
+
+		if (local_class == TF2_Demoman) {
+			/*Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+			Math::AngleVectors(cmd->viewangles, &vecForward, &vecRight, &vecUp);
+			target.local_pos += ((vecForward * 16.0f) + (vecRight * 8.0f) + (vecUp * -6.0f));*/
+			target.ent_pos.z -= (IsTargetPlayer ? (!target_onground && target_velocity.z < 0.0f ? 50.0f : 30.0f) : 3.0f);
 		}
 
-		//hitscan correction
-		else
+		else if (local_class == TF2_Soldier) {
+			target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+		}
+
+		CPredictor Predictor(target.ent_pos, target_velocity, target_acceleration, target.ptr);
+		Solution_t Solution = {};
+
+		if (!Solve(target.local_pos, ProjectileWep, Predictor, Solution, target_onground))
+			return false;
+
+		target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
+
+		//post pred corrections
+		if (local_class == TF2_Demoman && IsTargetPlayer) {
+			//Idk how to correct pipes :(
+			Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+			Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
+			Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 50.0f));
+			Math::VectorAngles(vecVelocity, target.ang_to_ent);
+
+			//the game launches the pipes with ((vecForward * ProjectileInfo.speed) + (vecUp * 200.0f));
+			//but correcting the final angles with ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f)); doesn't do much good
+			//so just using (- (up * 50)) atm, the results are still far from desirable,
+			//but I think the solver itself has something to do with it
+		}
+
+		target.fov = Math::CalcFov(cmd->viewangles, target.ang_to_ent);
+	}
+
+	else
+	{
+		if (IsTargetPlayer)
 		{
+			int hitbox = GetAimHitbox(pLocal, wep);
 			int vis_hitbox = -1;
 
 			//if the pos is not visible (or if we're aiming at the head but the hitbox is not head) try some corrections
@@ -182,7 +180,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 					if (!hdr)
 						return false;
 
-					matrix3x4 bone_matrix[128];
+					matrix3x4 bone_matrix[128];	
 					if (!target.ptr->SetupBones(bone_matrix, 128, 0x100, gInts.Globals->curtime))
 						return false;
 
@@ -197,9 +195,10 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 					Vec3 mins = (box->bbmin * MpScale);
 					Vec3 maxs = (box->bbmax * MpScale);
 
+					//I hope these are what I think they are lmao
 					Vec3 points[5] = {
-						Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z), //top center for aim height meme
-						Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)), //sides center:
+						Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z), //top center
+						Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)), //sides center
 						Vec3(mins.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
 						Vec3(((mins.x + maxs.x) * 0.5f), maxs.y, ((mins.z + maxs.z) * 0.5f)),
 						Vec3(((mins.x + maxs.x) * 0.5f), mins.y, ((mins.z + maxs.z) * 0.5f))
@@ -258,95 +257,61 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 				}
 			}
 		}
-	}
 
-	else //this is kinda a mess, I just tried it and it worked so /shrug
-	{
-		Ray_t ray;
-		ray.Init(target.local_pos, target.ent_pos);
-		CTraceFilter filter;
-		filter.pSkip = target.ptr;
-		CGameTrace trace;
-		gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
-
-		int found = 1;
-
-		if (trace.fraction < 0.99f)
+		else
 		{
-			found = 0;
+			Ray_t ray;
+			ray.Init(target.local_pos, target.ent_pos);
+			CTraceFilter filter;
+			filter.pSkip = target.ptr;
+			CGameTrace trace;
+			gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
 
-			if (!Multipoint)
-				return false;
-
-			matrix3x4 &transform = target.ptr->GetRgflCoordinateFrame();
-
-			Vec3 mins = (target.ptr->GetCollideableMins() * 0.85f);
-			Vec3 maxs = (target.ptr->GetCollideableMaxs() * 0.85f);
-
-			Vec3 points[5] = {
-				Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z),
-				Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
-				Vec3(mins.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
-				Vec3(((mins.x + maxs.x) * 0.5f), maxs.y, ((mins.z + maxs.z) * 0.5f)),
-				Vec3(((mins.x + maxs.x) * 0.5f), mins.y, ((mins.z + maxs.z) * 0.5f))
-			};
-
-			Vec3 out[5] = { Vec3() };
-
-			for (int n = 0; n < 5; n++)
+			if (trace.fraction < 0.99f)
 			{
-				Math::VectorTransform(points[n], transform, out[n]);
-
-				Ray_t ray;
-				ray.Init(target.local_pos, out[n]);
-				CTraceFilter filter;
-				filter.pSkip = target.ptr;
-				CGameTrace trace;
-				gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
-
-				if (trace.fraction > 0.98f)
-				{
-					target.ent_pos = out[n];
-					found = 1;
-
-					if (n != OldAimPoint) {
-						OldAimPoint = n;
-						SmoothStartTime = gInts.Globals->curtime;
-						SmoothStartAngle = cmd->viewangles;
-					}
-				}
-			}
-		}
-
-		if (found)
-		{
-			CProjectileWeapon ProjectileWep(wep);
-
-			if (ProjectileWep.GetWeaponInfo().gravity > 0.0f)
-			{
-				if (!ProjectileAim)
+				if (!Multipoint)
 					return false;
 
-				switch (pLocal->GetClassNum()) {
-					case TF2_Demoman: {
-						target.ent_pos.z -= 5.0f;
-						break;
+				matrix3x4 &transform = target.ptr->GetRgflCoordinateFrame(); //not sure if this is the right way to do this
+
+				Vec3 mins = (target.ptr->GetCollideableMins() * 0.85f); //we can have these quite high because buildings don't move
+				Vec3 maxs = (target.ptr->GetCollideableMaxs() * 0.85f);
+
+				Vec3 points[5] = {
+					Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z),
+					Vec3(maxs.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
+					Vec3(mins.x, ((mins.y + maxs.y) * 0.5f), ((mins.z + maxs.z) * 0.5f)),
+					Vec3(((mins.x + maxs.x) * 0.5f), maxs.y, ((mins.z + maxs.z) * 0.5f)),
+					Vec3(((mins.x + maxs.x) * 0.5f), mins.y, ((mins.z + maxs.z) * 0.5f))
+				};
+
+				Vec3 out[5] = { Vec3() };
+
+				for (int n = 0; n < 5; n++)
+				{
+					Math::VectorTransform(points[n], transform, out[n]);
+
+					ray.Init(target.local_pos, out[n]);
+					filter.pSkip = target.ptr;
+					gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
+
+					if (trace.fraction > 0.98f)
+					{
+						target.ang_to_ent = Math::CalcAngle(target.local_pos, out[n]);
+
+						if (n != OldAimPoint) {
+							OldAimPoint = n;
+							SmoothStartTime = gInts.Globals->curtime;
+							SmoothStartAngle = cmd->viewangles;
+						}
+
+						return true;
 					}
 				}
 
-				CPredictor Predictor(target.ent_pos, Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.0f), target.ptr);
-				Solution_t Solution = {};
-
-				if (Solve(target.local_pos, ProjectileWep, Predictor, Solution, true)) {
-					target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
-					return true;
-				}
+				return false;
 			}
-
-			else target.ang_to_ent = Math::CalcAngle(target.local_pos, target.ent_pos);
 		}
-
-		else return false;
 	}
 
 	return true;
@@ -399,6 +364,7 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 		float method = 0.0f;
 
+		//more @ https://easings.net // https://github.com/acron0/Easings/blob/master/Easings.cs 
 		switch (AimMethod) {
 			case 0: { method = time; break; }
 			case 1: { method = Math::ExponentialEaseOut(time); break; }
@@ -456,7 +422,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 					if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
 						return false;
 
-					if ((gInts.Globals->curtime - timer) < 0.05f) //wait a bit so we don't shoot the very edge of the hitbox
+					if ((gInts.Globals->curtime - timer) < 0.065f) //wait a bit so we don't shoot the very edge of the hitbox
 						return false;
 				}
 
@@ -469,7 +435,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 		}
 	}
 
-	//do all the other checks after the aim is done
+	//do all the other checks after the aim (smoothing) is done
 
 	int wep_slot	= wep->GetSlot();
 	int wep_idx		= wep->GetItemDefinitionIndex();
@@ -521,7 +487,6 @@ bool CAimbot::TargetChanged()
 
 	if (gLocalInfo.CurrentTargetIndex != old_target) {
 		old_target = gLocalInfo.CurrentTargetIndex;
-		OldAimPoint = -1;
 		return true;
 	}
 
@@ -548,7 +513,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		if (CorrectionMethod == 1)
 		{
 			if (!CorrectAimPos(pLocal, pLocalWeapon, cmd, target)) {
-				SmoothStartTime = gInts.Globals->curtime;
+				SmoothStartTime = gInts.Globals->curtime; //play a game and count how many times I reset these :^)
 				SmoothStartAngle = cmd->viewangles;
 				return;
 
