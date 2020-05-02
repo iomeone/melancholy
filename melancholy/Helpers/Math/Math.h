@@ -501,36 +501,18 @@ namespace Math
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
 
-	inline float SineEaseIn(float p) {
-		return sin((p - 1) * (PI / 2.0f)) + 1;
-	}
-
-	inline float CircularEaseOut(float p) {
-		return sqrt((2 - p) * p);
-	}
-
 	inline float ExponentialEaseOut(float p) {
 		return (p == 1.0f) ? p : 1 - pow(2, -10 * p);
 	}
 
-	inline float BounceEaseOut(float p) {
-		if (p < 4 / 11.0f)
-			return (121 * p * p) / 16.0f;
-
-		else if (p < 8 / 11.0f)
-			return (363 / 40.0f * p * p) - (99 / 10.0f * p) + 17 / 5.0f;
-
-		else if (p < 9 / 10.0f)
-			return (4356 / 361.0f * p * p) - (35442 / 1805.0f * p) + 16061 / 1805.0f;
-
-		else return (54 / 5.0f * p * p) - (513 / 25.0f * p) + 268 / 25.0f;
+	inline float ExponentialEaseIn(float p) {
+		return (p == 0.0f) ? p : pow(2, 10 * (p - 1));
 	}
 
-	inline float BounceEaseIn(float p) {
-		return 1 - BounceEaseOut(1 - p);
-	}
+	inline float QuadraticEaseInOut(float p) {
+		if (p < 0.5f)
+			return 2 * p * p;
 
-	inline float BounceEaseInOut(float p) {
-		return (p < 0.5f ? 0.5f * BounceEaseIn(p * 2) : 0.5f * BounceEaseOut(p * 2 - 1) + 0.5f);
+		else return (-2 * p * p) + (4 * p) - 1;
 	}
 }

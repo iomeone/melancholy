@@ -182,7 +182,7 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 
 bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
 {
-	static const float MAX_TIME = 1.5f;
+	static const float MAX_TIME = 1.25f;
 	static const float TIME_STEP = 1.0f / 256.0f;
 
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)

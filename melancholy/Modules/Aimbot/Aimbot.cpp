@@ -79,6 +79,12 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 	
 	for (auto &v : Targets)
 	{	
+		if (CorrectionMethod == 0)
+		{
+			if (!CorrectAimPos(pLocal, wep, cmd, v))
+				continue;
+		}
+
 		if (is_melee)
 		{
 			if (InRangeOnly && !Utils::CanMeleeHit(wep, v.ang_to_ent, v.ptr->GetIndex()))
@@ -188,8 +194,8 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 					if (!box)
 						return false;
 
-					Vec3 mins = (box->bbmin * 0.75f); //scale them down a bit for accuraccy reasons
-					Vec3 maxs = (box->bbmax * 0.75f);
+					Vec3 mins = (box->bbmin * MpScale);
+					Vec3 maxs = (box->bbmax * MpScale);
 
 					Vec3 points[5] = {
 						Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z), //top center for aim height meme
@@ -229,7 +235,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 					if (!Hitscan)
 						return false;
 
-					for (int n = 1; n < target.ptr->GetNumOfHitboxes(); n++)
+					for (int n = (HitscanSkipHead ? 1 : 0); n < target.ptr->GetNumOfHitboxes(); n++)
 					{
 						Vec3 vis_body = target.ptr->GetHitboxPos(n);
 
@@ -268,6 +274,9 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		if (trace.fraction < 0.99f)
 		{
 			found = 0;
+
+			if (!Multipoint)
+				return false;
 
 			matrix3x4 &transform = target.ptr->GetRgflCoordinateFrame();
 
@@ -387,7 +396,17 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 		float time = std::clamp(((gInts.Globals->curtime - SmoothStartTime) / AimTime), 0.0f, 1.0f);
 		Vec3 delta = (target.ang_to_ent - SmoothStartAngle);
 		Math::ClampAngles(delta);
-		cmd->viewangles += (delta * (AimMethod < 1 ? time : Math::ExponentialEaseOut(time)));
+
+		float method = 0.0f;
+
+		switch (AimMethod) {
+			case 0: { method = time; break; }
+			case 1: { method = Math::ExponentialEaseOut(time); break; }
+			case 2: { method = Math::ExponentialEaseIn(time); break; }
+			case 3: { method = Math::QuadraticEaseInOut(time); break; }
+		}
+
+		cmd->viewangles += (delta * method);
 		gInts.Engine->SetViewAngles(cmd->viewangles);
 		AimFinished = (time > 0.99f);
 	}
@@ -526,14 +545,17 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
-		if (!CorrectAimPos(pLocal, pLocalWeapon, cmd, target)) {
-			SmoothStartTime = gInts.Globals->curtime;
-			SmoothStartAngle = cmd->viewangles;
-			return;
+		if (CorrectionMethod == 1)
+		{
+			if (!CorrectAimPos(pLocal, pLocalWeapon, cmd, target)) {
+				SmoothStartTime = gInts.Globals->curtime;
+				SmoothStartAngle = cmd->viewangles;
+				return;
 
-			//CONS: since at this stage we only have one target,
-			//		returning here means not aiming at someone else
-			//PROS: very cheap to do as we do all the correction checks for 1 entity only
+				//CONS: since at this stage we only have one target,
+				//		returning here means not aiming at someone else
+				//PROS: very cheap to do as we do all the correction checks for 1 entity only
+			}
 		}
 
 		int wep_idx = pLocalWeapon->GetItemDefinitionIndex();

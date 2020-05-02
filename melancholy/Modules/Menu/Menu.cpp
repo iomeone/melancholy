@@ -100,16 +100,18 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 			{
 				Utils::clamp(gESP.CustomFOV, 70, 130);
 				Utils::clamp(gAimbot.AimFov, 1.0f, 180.0f);
+				Utils::clamp(gAimbot.MpScale, 0.55f, 0.95f);
 
 				if (ImGui::BeginTabItem("aimbot"))
 				{
 					static const char *szKeys[]			= { "lshift", "lbutton" };
 					static const char *szHitbox[]		= { "head", "body", "auto" };
-					static const char *szSmoothing[]	= { "time", "ease" };
+					static const char *szSmoothing[]	= { "time", "out expo", "in expo", "in out quad" };
+					static const char *szCorrection[]	= { "expensive", "cheap" };
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
+					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.7f), true))
 					{
 						ImGui::Text("main");
 						ImGui::PushItemWidth(90.0f);
@@ -118,8 +120,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-						ImGui::Checkbox("active",					&gAimbot.Active);
-						ImGui::Checkbox("projectile prediction",	&gAimbot.ProjectileAim);
+						ImGui::Checkbox("active", &gAimbot.Active);
 
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();
@@ -130,25 +131,12 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Combo		("key",					&gAimbot.AimKey, szKeys, IM_ARRAYSIZE(szKeys));
 						ImGui::InputFloat	("fov",					&gAimbot.AimFov, 1.0f, 1.0f, 0);
 						
-						ImGui::PopItemWidth();
-						ImGui::EndChild();
-					}
-
-					ImGui::SameLine();
-
-					if (ImGui::BeginChild("hitscan_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
-					{
-						ImGui::Text("hitscan");
-						ImGui::PushItemWidth(90.0f);
-
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
 						ImGui::Checkbox("wait for headshot",	&gAimbot.WaitForHS);
 						ImGui::Checkbox("scoped only",			&gAimbot.ScopedOnly);
-						ImGui::Checkbox("multipoint",			&gAimbot.Multipoint);
-						ImGui::Checkbox("hitscan",				&gAimbot.Hitscan);
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -156,7 +144,44 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 					ImGui::SameLine();
 
-					if (ImGui::BeginChild("melee_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
+					if (ImGui::BeginChild("correction_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.7f), true))
+					{
+						ImGui::Text("corrections");
+						ImGui::PushItemWidth(90.0f);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Combo("method", &gAimbot.CorrectionMethod, szCorrection, IM_ARRAYSIZE(szCorrection));
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Checkbox("multipoint", &gAimbot.Multipoint);
+						ImGui::InputFloat("scale", &gAimbot.MpScale, 0.05f, 0.05f, 2);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Checkbox("hitscan", &gAimbot.Hitscan);
+						ImGui::Checkbox("skip head", &gAimbot.HitscanSkipHead);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Checkbox("projectile pred", &gAimbot.ProjectileAim);
+
+						ImGui::PopItemWidth();
+						ImGui::EndChild();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::BeginChild("melee_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.7f), true))
 					{
 						ImGui::Text("melee");
 						ImGui::PushItemWidth(90.0f);
@@ -229,8 +254,8 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-						ImGui::SliderFloat	("time",	&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
-						ImGui::Combo		("method",	&gAimbot.AimMethod, szSmoothing, IM_ARRAYSIZE(szSmoothing));
+						ImGui::SliderFloat	("duration",	&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
+						ImGui::Combo		("method",		&gAimbot.AimMethod, szSmoothing, IM_ARRAYSIZE(szSmoothing));
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();

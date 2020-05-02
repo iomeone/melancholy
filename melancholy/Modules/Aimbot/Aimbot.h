@@ -26,7 +26,6 @@ private:
 public:
 	//main
 	bool Active			= true;
-	bool ProjectileAim	= false;
 	bool Silent			= false;
 	bool Autoshoot		= false;
 	int AimKey			= 0; //0 lshift 1 lbutton
@@ -35,8 +34,6 @@ public:
 	//hitscan
 	bool WaitForHS	= true;
 	bool ScopedOnly = false;
-	bool Multipoint = true;
-	bool Hitscan	= true;
 
 	//melee
 	bool AimMelee		= true;
@@ -51,13 +48,25 @@ public:
 	bool RemoveDisguise		= false;
 
 	//buildings
-	bool AimSentry				= true;
-	bool AimDispenser			= true;
-	bool AimTeleporter			= true;
+	bool AimSentry		= true;
+	bool AimDispenser	= true;
+	bool AimTeleporter	= true;
 
 	//smoothing
 	float AimTime	= 0.0f;
-	int AimMethod	= 0;	//0 time 1 ease
+	int AimMethod	= 0;	//0 time 1 out expo 2 in expo 3 in out quad
+
+	//corrections
+	int CorrectionMethod	= 0; //0 expensive 1 cheap
+
+	bool Multipoint			= true;
+	float MpScale			= 0.75f;
+
+	bool Hitscan			= true;
+	bool HitscanSkipHead	= true;
+
+	bool ProjectileAim		= false;
+
 
 	void Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd);
 };
