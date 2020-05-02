@@ -265,7 +265,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 			CTraceFilter filter;
 			filter.pSkip = target.ptr;
 			CGameTrace trace;
-			gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
+			gInts.EngineTrace->TraceRay(ray, MASK_SHOT, &filter, &trace);
 
 			if (trace.fraction < 0.99f)
 			{
@@ -274,8 +274,14 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 
 				matrix3x4 &transform = target.ptr->GetRgflCoordinateFrame(); //not sure if this is the right way to do this
 
-				Vec3 mins = (target.ptr->GetCollideableMins() * 0.85f); //we can have these quite high because buildings don't move
-				Vec3 maxs = (target.ptr->GetCollideableMaxs() * 0.85f);
+				CObject *building = reinterpret_cast<CObject *>(target.ptr);
+
+				if (!building)
+					return false;
+
+				float scale = (building->GetLevel() < 2 ? 0.70f : 0.85f); //0.85f was missing on lvl 1 sentry
+				Vec3 mins = (target.ptr->GetCollideableMins() * scale); //we can have these quite high because buildings don't move
+				Vec3 maxs = (target.ptr->GetCollideableMaxs() * scale);
 
 				Vec3 points[5] = {
 					Vec3(((mins.x + maxs.x) * 0.5f), ((mins.y + maxs.y) * 0.5f), maxs.z),
@@ -293,7 +299,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 
 					ray.Init(target.local_pos, out[n]);
 					filter.pSkip = target.ptr;
-					gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace);
+					gInts.EngineTrace->TraceRay(ray, MASK_SHOT, &filter, &trace);
 
 					if (trace.fraction > 0.98f)
 					{
@@ -413,14 +419,17 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 				CTraceFilter filter;
 				filter.pSkip = pLocal;
 				CGameTrace trace;
-				gInts.EngineTrace->TraceRay(ray, ((target.ptr->IsPlayer() ? MASK_SHOT : MASK_SHOT_HULL) | CONTENTS_GRATE), &filter, &trace);
+				gInts.EngineTrace->TraceRay(ray, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
 
 				static float timer = gInts.Globals->curtime;
 
 				//if we're already on a target, shoot even if aim (smooth) hasn't finished
-				if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex()) {
-					if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
-						return false;
+				if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex())
+				{
+					if (target.ptr->IsPlayer()) {
+						if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
+							return false;
+					}
 
 					if ((gInts.Globals->curtime - timer) < 0.065f) //wait a bit so we don't shoot the very edge of the hitbox
 						return false;

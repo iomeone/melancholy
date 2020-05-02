@@ -534,6 +534,7 @@ void CESP::Run(CBaseEntity *pLocal)
 		}
 	}
 
+	//this still for some reason shows "ghost" spectators
 	if (pLocal->IsAlive() && SpectatorList)
 	{
 		//add the spectators to the vector

@@ -396,6 +396,7 @@ bool CBaseEntity::IsCritBoosted()
 	int nCondEx = this->GetCondEx();
 
 	return (nCond & TFCond_Kritzkrieged
+		|| nCond & TFCond_MiniCrits
 		|| nCondEx & TFCondEx_CritCanteen
 		|| nCondEx & TFCondEx_CritOnFirstBlood
 		|| nCondEx & TFCondEx_CritOnWin
@@ -566,7 +567,9 @@ bool CTraceFilterNoPlayers::ShouldHitEntity(void *pEntityHandle, int nContentsMa
 		case 64:
 		case 117:
 		case 225:
-		case CTFPlayer: {
+		case CTFPlayer:
+		case CBaseAnimating:
+		case CTFAmmoPack: {
 			return false;
 		}
 	}
