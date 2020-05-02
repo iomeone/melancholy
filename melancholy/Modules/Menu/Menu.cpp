@@ -1,5 +1,7 @@
 #include "Menu.h"
 
+#define IM_ASSERT(_EXPR)  ((void)(_EXPR)) // Disable asserts
+
 void CMenu::Run(IDirect3DDevice9 *pDevice)
 {
 	static bool init = false;
@@ -290,6 +292,12 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Checkbox	("buildings",	&gESP.Buildings);
 						ImGui::Checkbox	("pickups",		&gESP.Pickups);
 
+						ImGui::Checkbox("highlight target", &gESP.HighlightTarget);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
 					}
@@ -325,7 +333,6 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Combo	("text pos",			&gESP.PlayerTextPos, szTextPos, IM_ARRAYSIZE(szTextPos));
 						ImGui::Checkbox	("no teammates",		&gESP.NoTeammatePlayers);
 						ImGui::Checkbox	("ignore cloaked",		&gESP.IgnoreCloaked);
-						ImGui::Checkbox	("highlight target",	&gESP.HighlightTarget);
 
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();

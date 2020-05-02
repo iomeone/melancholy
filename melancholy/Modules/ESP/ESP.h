@@ -39,10 +39,11 @@ public:
 	RGBA_t ColSpec		{ 255, 80, 80, 255 };
 
 	//-------------------------------------------------- main
-	bool Active		= true;
-	bool Players	= true;
-	bool Buildings	= true;
-	bool Pickups	= true;
+	bool Active				= true;
+	bool Players			= true;
+	bool Buildings			= true;
+	bool Pickups			= true;
+	bool HighlightTarget	= true;
 
 	//-------------------------------------------------- local
 	bool SpectatorList	= true;
@@ -56,7 +57,6 @@ public:
 	int PlayerTextPos		= 0;	//0 top right 1 left bottom 2 center
 	bool NoTeammatePlayers	= true;
 	bool IgnoreCloaked		= false;
-	bool HighlightTarget	= true;
 	bool PlayerName			= true;
 	bool PlayerHealth		= false;
 	int PlayerHealthBar		= 1;	//0 off 1 vertical 2 horizontal
