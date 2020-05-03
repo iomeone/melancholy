@@ -7,7 +7,7 @@ void ThirdpersonDrawFix(CBaseEntity *pLocal)
 {
 	static DWORD offset = (gNetVars.get_offset("DT_BaseEntity", "moveparent") - 0xC); //- 12 to get at 0x1B0
 
-	if (!pLocal->IsAlive() || pLocal->GetClassNum() != TF2_Sniper || !gESP.Active || !gESP.Thirdperson)
+	if (!pLocal->IsAlive() || pLocal->GetClassNum() != TF2_Sniper || !gESP.Thirdperson)
 		return;
 
 	CBaseCombatWeapon *pLocalWeapon = pLocal->GetActiveWeapon();
@@ -23,7 +23,8 @@ void ThirdpersonDrawFix(CBaseEntity *pLocal)
 		CBaseEntity *attachment = gInts.EntityList->GetClientEntity(*reinterpret_cast<int*>((pLocal + offset)) & 0xFFF);
 		int count = 0;
 
-		while (attachment && count++ < 32) {
+		while (attachment && count++ < 32) 
+		{
 			if (attachment->GetClassId() == CTFWearable)
 				attachment->RemoveEffect(EF_NODRAW);
 
@@ -45,9 +46,9 @@ void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t
 	if (frame == FRAME_RENDER_START)
 		ThirdpersonDrawFix(pLocal);
 
-	if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
-		if (gESP.NoPunch && pLocal->IsAlive()) //dynvars be like no can do
-			*reinterpret_cast<Vec3 *>(pLocal + 0xE8C) = Vec3(0.0f, 0.0f, 0.0f);
+	if (gESP.NoPunch && pLocal->IsAlive()) { //dynvars be like no can do
+		*reinterpret_cast<Vec3 *>(pLocal + 0xE8C) = Vec3(0.0f, 0.0f, 0.0f); //m_vecPunchAngle
+		*reinterpret_cast<Vec3 *>(pLocal + 0xEC8) = Vec3(0.0f, 0.0f, 0.0f); //m_vecPunchAngleVel
 	}
 
 	gGlow.Run(pLocal, frame);

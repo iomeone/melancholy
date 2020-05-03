@@ -4,7 +4,8 @@ using fn = void(__thiscall *)(void *, unsigned int, bool, bool);
 
 void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_panel, bool force_repaint, bool allow_force)
 {
-	if (gESP.Active && gESP.NoScope) {
+	if (gESP.NoScope)
+	{
 		const char *szHudScope = gInts.Panels->GetName(vgui_panel);
 
 		if (szHudScope[0] == 'H' && szHudScope[3] == 'S' && szHudScope[8] == '\0')
@@ -40,7 +41,7 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 		CBaseEntity *local = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
 		if (local && local->IsAlive())
-			local->ForceTauntCam(gESP.Active && gESP.Thirdperson);
+			local->ForceTauntCam(gESP.Thirdperson);
 
 		gESP.Run(local);
 

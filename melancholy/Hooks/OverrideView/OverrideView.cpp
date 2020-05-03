@@ -7,7 +7,7 @@ void __fastcall OverrideView::Hook(void *pClientMode, int edx, CViewSetup *pView
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
-	if (!pLocal || !pLocal->IsAlive() || !gESP.Active)
+	if (!pLocal)
 		return;
 
 	if (gESP.NoZoom) {
