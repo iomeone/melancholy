@@ -279,7 +279,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 				if (!building)
 					return false;
 
-				float scale = (building->GetLevel() < 2 ? 0.70f : 0.85f); //0.85f was missing on lvl 1 sentry
+				float scale = ((building->GetLevel() < 2 && building->GetClassId() == CObjectSentrygun) ? 0.70f : 0.85f); //0.85f was missing on lvl 1 sentry
 				Vec3 mins = (target.ptr->GetCollideableMins() * scale); //we can have these quite high because buildings don't move
 				Vec3 maxs = (target.ptr->GetCollideableMaxs() * scale);
 

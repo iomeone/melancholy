@@ -14,10 +14,37 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 			if (!ent || ent == pLocal || (!ent->IsPlayer() && !ent->IsBuilding())) //fuck glowing other entities (crashing 24/7)
 				continue;
 
-			ent->SetGlowEnabled(ent->IsAlive() && !ent->IsDormant());
+			bool cond = (ent->IsAlive() && !ent->IsDormant());
+			ent->SetGlowEnabled(cond);
 
-			if (ent->IsGlowEnabled())
-				ent->UpdateGlowEffect();
+			if (cond)
+			{
+				int temp = 0;
+				if (!ent->HasGlowEffect(temp))
+				{
+					ent->UpdateGlowEffect();
+
+					/*
+					void C_BaseCombatCharacter::UpdateGlowEffect( void ) //I believe buildings also have this function
+					{
+						// destroy the existing effect
+						if ( m_pGlowEffect )
+						{
+							DestroyGlowEffect();
+						}
+
+						// create a new effect
+						if ( m_bGlowEnabled || m_bClientSideGlowEnabled )
+						{
+							float r, g, b;
+							GetGlowEffectColor( &r, &g, &b );
+
+							m_pGlowEffect = new CGlowObject( this, Vector( r, g, b ), 1.0, true );
+						}
+					}
+					*/
+				}
+			}
 		}
 	}
 
