@@ -50,7 +50,6 @@ public:
 	bool Thirdperson	= false;
 	bool NoScope		= true;
 	bool NoZoom			= true;
-	bool NoPunch		= true;
 	int CustomFOV		= 110;
 
 	//-------------------------------------------------- players

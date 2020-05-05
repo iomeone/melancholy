@@ -363,8 +363,10 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 	if (AimTime > 0.0f)
 	{
-		cmd->viewangles = SmoothStartAngle;
 		float time = std::clamp(((gInts.Globals->curtime - SmoothStartTime) / AimTime), 0.0f, 1.0f);
+		AimFinished = (time > 0.99f);
+
+		cmd->viewangles = SmoothStartAngle;
 		Vec3 delta = (target.ang_to_ent - SmoothStartAngle);
 		Math::ClampAngles(delta);
 
@@ -380,7 +382,6 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 		cmd->viewangles += (delta * method);
 		gInts.Engine->SetViewAngles(cmd->viewangles);
-		AimFinished = (time > 0.99f);
 	}
 
 	else

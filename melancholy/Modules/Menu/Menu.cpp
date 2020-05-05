@@ -256,8 +256,8 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
-						ImGui::SliderFloat	("duration",	&gAimbot.AimTime, 0.0f, 1.0f, "%.1fs");
-						ImGui::Combo		("method",		&gAimbot.AimMethod, szSmoothing, IM_ARRAYSIZE(szSmoothing));
+						ImGui::SliderFloat	("duration",		&gAimbot.AimTime,		0.0f, 1.0f, "%.1fs");
+						ImGui::Combo		("method",			&gAimbot.AimMethod, szSmoothing, IM_ARRAYSIZE(szSmoothing));
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -292,11 +292,11 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::Checkbox	("buildings",	&gESP.Buildings);
 						ImGui::Checkbox	("pickups",		&gESP.Pickups);
 
-						ImGui::Checkbox("highlight target", &gESP.HighlightTarget);
-
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 						ImGui::Separator();
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						ImGui::Checkbox("highlight target", &gESP.HighlightTarget);
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -413,7 +413,6 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 								ImGui::Checkbox("thirdperson",	&gESP.Thirdperson);
 								ImGui::Checkbox("remove scope",	&gESP.NoScope);
 								ImGui::Checkbox("remove zoom",	&gESP.NoZoom);
-								ImGui::Checkbox("remove punch",	&gESP.NoPunch);
 								ImGui::InputInt("fov",			&gESP.CustomFOV);
 
 								ImGui::PopItemWidth();

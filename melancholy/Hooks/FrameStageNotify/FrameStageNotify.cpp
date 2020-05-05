@@ -36,20 +36,43 @@ void ThirdpersonDrawFix(CBaseEntity *pLocal)
 void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t frame)
 {
 	VMTManager &hk = VMTManager::GetHook(client);
-	hk.GetMethod<fn>(Index)(client, frame);
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
 	if (!pLocal)
 		return;
 
+	gGlow.Run(pLocal, frame);
+
+	static Vec3 *pPunchAng	= nullptr;
+	static Vec3 *pPunchVel	= nullptr;
+	static Vec3 vecPunchAng = Vec3();
+	static Vec3 vecPunchVel = Vec3();
+
 	if (frame == FRAME_RENDER_START)
+	{
 		ThirdpersonDrawFix(pLocal);
 
-	if (gESP.NoPunch && pLocal->IsAlive()) { //dynvars be like no can do
-		*reinterpret_cast<Vec3 *>(pLocal + 0xE8C) = Vec3(0.0f, 0.0f, 0.0f); //m_vecPunchAngle
-		*reinterpret_cast<Vec3 *>(pLocal + 0xEC8) = Vec3(0.0f, 0.0f, 0.0f); //m_vecPunchAngleVel
+		if (pLocal->IsAlive())
+		{
+			pPunchAng = reinterpret_cast<Vec3 *>(pLocal + 0xE8C);
+			pPunchVel = reinterpret_cast<Vec3 *>(pLocal + 0xEC8);
+
+			if (pPunchAng && pPunchVel)
+			{
+				vecPunchAng = *pPunchAng;
+				vecPunchVel = *pPunchVel;
+
+				pPunchAng->Set();
+				pPunchVel->Set();
+			}
+		}
 	}
 
-	gGlow.Run(pLocal, frame);
+	hk.GetMethod<fn>(Index)(client, frame);
+
+	if (pPunchAng && pPunchVel) {
+		*pPunchAng = vecPunchAng;
+		*pPunchVel = vecPunchVel;
+	}
 }
