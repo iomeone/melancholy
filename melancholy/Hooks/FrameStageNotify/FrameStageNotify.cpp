@@ -36,6 +36,7 @@ void ThirdpersonDrawFix(CBaseEntity *pLocal)
 void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t frame)
 {
 	VMTManager &hk = VMTManager::GetHook(client);
+	hk.GetMethod<fn>(Index)(client, frame);
 
 	CBaseEntity *pLocal = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
@@ -44,35 +45,7 @@ void __fastcall FrameStageNotify::Hook(PVOID client, int edx, ClientFrameStage_t
 
 	gGlow.Run(pLocal, frame);
 
-	static Vec3 *pPunchAng	= nullptr;
-	static Vec3 *pPunchVel	= nullptr;
-	static Vec3 vecPunchAng = Vec3();
-	static Vec3 vecPunchVel = Vec3();
-
-	if (frame == FRAME_RENDER_START)
-	{
+	if (frame == FRAME_RENDER_START) {
 		ThirdpersonDrawFix(pLocal);
-
-		if (pLocal->IsAlive())
-		{
-			pPunchAng = reinterpret_cast<Vec3 *>(pLocal + 0xE8C);
-			pPunchVel = reinterpret_cast<Vec3 *>(pLocal + 0xEC8);
-
-			if (pPunchAng && pPunchVel)
-			{
-				vecPunchAng = *pPunchAng;
-				vecPunchVel = *pPunchVel;
-
-				pPunchAng->Set();
-				pPunchVel->Set();
-			}
-		}
-	}
-
-	hk.GetMethod<fn>(Index)(client, frame);
-
-	if (pPunchAng && pPunchVel) {
-		*pPunchAng = vecPunchAng;
-		*pPunchVel = vecPunchVel;
 	}
 }

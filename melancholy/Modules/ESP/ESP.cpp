@@ -524,6 +524,8 @@ void CESP::Run(CBaseEntity *pLocal)
 		}
 	}
 
+	//below are draws that happen on top of ESP's draws
+
 	if (!gLocalInfo.PredStart.IsZero())
 	{
 		Vec3 Start2D, End2D;
@@ -542,7 +544,22 @@ void CESP::Run(CBaseEntity *pLocal)
 		{
 			CBaseEntity *ent = gInts.EntityList->GetClientEntity(n);
 
-			if (!ent || ent == pLocal || ent->IsAlive() || ent->GetTeamNum() != pLocal->GetTeamNum())
+			if (!ent || ent == pLocal || !ent->IsPlayer() || ent->IsAlive()) //removed same team check, in case of players spectating you in spectator team
+				continue;
+
+			auto get_mode = [&](CBaseEntity *player) -> std::string
+			{
+				switch (player->GetObserverMode()) 
+				{
+					case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
+					case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
+					default: { return std::string(); }
+				}
+			};
+
+			std::string mode = get_mode(ent);
+
+			if (mode.empty())
 				continue;
 
 			CBaseEntity *observed_player = gInts.EntityList->GetClientEntityFromHandle(ent->GetObserverTarget());
@@ -553,19 +570,6 @@ void CESP::Run(CBaseEntity *pLocal)
 			PlayerInfo_t playerInfo;
 
 			if (!gInts.Engine->GetPlayerInfo(ent->GetIndex(), &playerInfo))
-				continue;
-
-			auto get_mode = [&](CBaseEntity *player) -> std::string {
-				switch (player->GetObserverMode()) {
-					case OBS_MODE_FIRSTPERSON: { return "1st-person"; }
-					case OBS_MODE_THIRDPERSON: { return "3rd-person"; }
-					default: { return std::string(); }
-				}
-			};
-
-			std::string mode = get_mode(ent);
-
-			if (mode.empty())
 				continue;
 
 			spectators.push_back({ playerInfo.name, mode });
