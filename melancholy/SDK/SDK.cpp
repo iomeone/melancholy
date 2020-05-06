@@ -692,7 +692,7 @@ bool CBaseCombatWeapon::CanWeaponHeadShot()
 		}
 
 		case TF2_Spy: {
-			return (this->GetDamageType() & DMG_USE_HITLOCATIONS && this->CanFireCriticalShot(true));
+			return (this->GetDamageType() & DMG_USE_HITLOCATIONS && this->CanFireCriticalShot(true)); //credits to bertti
 		}
 	}
 

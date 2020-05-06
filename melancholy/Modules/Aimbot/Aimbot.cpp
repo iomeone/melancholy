@@ -47,9 +47,6 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 
 		else if (ent->IsBuilding())
 		{
-			if (!AimSentry && !AimDispenser && !AimTeleporter)
-				continue;
-
 			if (!AimSentry && ent->GetClassId() == CObjectSentrygun)
 				continue;
 
@@ -229,7 +226,7 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 				}
 
 				//hitscan
-				else if (hitbox == HITBOX_PELVIS)
+				else if (hitbox == HITBOX_PELVIS || hitbox == HITBOX_BODY)
 				{
 					if (!Hitscan)
 						return false;
@@ -340,11 +337,14 @@ int CAimbot::GetAimHitbox(CBaseEntity *pLocal, CBaseCombatWeapon *wep)
 
 		int wep_idx = wep->GetItemDefinitionIndex();
 
-		switch (pLocal->GetClassNum()) {
+		switch (pLocal->GetClassNum())
+		{
 			case TF2_Sniper:
 				return (wep_slot == 0 ? HITBOX_HEAD : HITBOX_PELVIS);
+
 			case TF2_Spy:
 				return ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) ? HITBOX_HEAD : HITBOX_PELVIS);
+
 			default:
 				return HITBOX_PELVIS;
 		}
@@ -386,19 +386,65 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 	else
 	{
-		if (Silent) {
+		if (Silent)
+		{
 			Utils::FixSilentMovement(cmd, target.ang_to_ent);
 			cmd->viewangles = target.ang_to_ent;
-			return;
 		}
 
-		cmd->viewangles = target.ang_to_ent;
-		gInts.Engine->SetViewAngles(target.ang_to_ent);
+		else
+		{
+			cmd->viewangles = target.ang_to_ent;
+			gInts.Engine->SetViewAngles(target.ang_to_ent);
+		}
 	}
 }
 
 bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Target_t &target, CUserCmd *cmd)
 {
+	int wep_slot	= wep->GetSlot();
+	int wep_idx		= wep->GetItemDefinitionIndex();
+	int class_num	= pLocal->GetClassNum();
+
+	if (class_num == TF2_Spy && wep_slot == 2 && target.ptr->IsPlayer())
+	{
+		if (AimMelee && AutoBackstab)
+		{
+			if (Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex())) {
+				if (Utils::CanBackstab(cmd->viewangles, target.ptr->GetEyeAngles(), (target.ptr->GetWorldSpaceCenter() - pLocal->GetWorldSpaceCenter())))
+					return true;
+			}
+			
+			return false;
+		}
+	}
+
+	if (!Autoshoot)
+		return false;
+
+	if (wep_slot < 2)
+	{
+		if (class_num == TF2_Sniper) {
+			if (wep_slot == 0 && pLocal->IsScoped() && WaitForHS && !gLocalInfo.CanHeadShot)
+				return false;
+		}
+
+		else if (class_num == TF2_Spy) {
+			if ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) && WaitForHS && !gLocalInfo.CanHeadShot)
+				return false;
+		}
+	}
+
+	else if (wep_slot == 2)
+	{
+		if (AimMelee && !InRangeOnly) {
+			if (!Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
+				return false;
+		}
+	}
+
+	//I think it's more logical to do ray checking after the cheaper checks pass
+
 	if (AimTime > 0.0f)
 	{
 		if (!AimFinished)
@@ -445,49 +491,6 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 		}
 	}
 
-	//do all the other checks after the aim (smoothing) is done
-
-	int wep_slot	= wep->GetSlot();
-	int wep_idx		= wep->GetItemDefinitionIndex();
-	int class_num	= pLocal->GetClassNum();
-
-	if (class_num == TF2_Spy && wep_slot == 2 && target.ptr->IsPlayer())
-	{
-		if (AimMelee && AutoBackstab)
-		{
-			if (Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex())) {
-				if (Utils::CanBackstab(cmd->viewangles, target.ptr->GetEyeAngles(), (target.ptr->GetWorldSpaceCenter() - pLocal->GetWorldSpaceCenter())))
-					return true;
-			}
-			
-			return false;
-		}
-	}
-
-	if (!Autoshoot)
-		return false;
-
-	if (wep_slot < 2)
-	{
-		if (class_num == TF2_Sniper) {
-			if (wep_slot == 0 && pLocal->IsScoped() && WaitForHS && !gLocalInfo.CanHeadShot)
-				return false;
-		}
-
-		else if (class_num == TF2_Spy) {
-			if ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) && WaitForHS && !gLocalInfo.CanHeadShot)
-				return false;
-		}
-	}
-
-	else if (wep_slot == 2)
-	{
-		if (AimMelee && !InRangeOnly) {
-			if (!Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
-				return false;
-		}
-	}
-
 	return true;
 }
 
@@ -510,7 +513,8 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		|| pLocal->IsTaunting()
 		|| !gInts.Engine->IsConnected()
 		|| !gInts.Engine->IsInGame()
-		|| gInts.Engine->Con_IsVisible())
+		|| gInts.Engine->Con_IsVisible()
+		|| gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	if (!AimMelee && pLocalWeapon->GetSlot() == 2)
