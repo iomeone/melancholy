@@ -474,7 +474,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 							ImGui::SameLine();
 
-							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							if (ImGui::BeginChild("building_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 							{
 								ImGui::Text("buildings");
 								ImGui::PushItemWidth(90.0f);
@@ -499,7 +499,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 							ImGui::SameLine();
 
-							if (ImGui::BeginChild("pickup_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.5f), true))
+							if (ImGui::BeginChild("pickup_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
 							{
 								ImGui::Text("pickups");
 								ImGui::PushItemWidth(90.0f);

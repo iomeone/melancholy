@@ -3,7 +3,7 @@
 Vec3 SmoothStartAngle	= Vec3();
 float SmoothStartTime	= 0.0f;
 bool AimFinished		= false;	//used for projectile autoshoot
-int OldAimPoint			= -1;		//used for reseting smoothing //TODO: something somewhere isn't working
+int OldAimPoint			= -1;		//used for reseting smoothing
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -70,29 +70,48 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 	if (Targets.empty())
 		return {}; //if it's empty abort
 
-	std::sort(Targets.begin(), Targets.end(), [&](const Target_t &a, const Target_t &b) -> bool {
-		return ((is_melee && AimAtClosest) ? (a.dist < b.dist) : (a.fov < b.fov));
-	});
-	
-	for (auto &v : Targets)
-	{	
-		if (CorrectionMethod == 0)
+	if (CorrectionMethod == 0)
+	{
+		std::sort(Targets.begin(), Targets.end(), [&](const Target_t &a, const Target_t &b) -> bool {
+			return ((is_melee && AimAtClosest) ? (a.dist < b.dist) : (a.fov < b.fov));
+		});
+
+		for (auto &v : Targets)
 		{
 			if (!CorrectAimPos(pLocal, wep, cmd, v))
 				continue;
-		}
 
-		if (is_melee)
-		{
-			if (InRangeOnly && !Utils::CanMeleeHit(wep, v.ang_to_ent, v.ptr->GetIndex()))
-				continue;
-			
-			if (AimAtClosest)
-				return v; //these are sorted already!
-		}
+			if (is_melee)
+			{
+				if (InRangeOnly && !Utils::CanMeleeHit(wep, v.ang_to_ent, v.ptr->GetIndex()))
+					continue;
 
-		if (v.fov < AimFov)
-			return v;
+				if (AimAtClosest)
+					return v; //these are sorted already!
+			}
+
+			if (v.fov < AimFov)
+				return v;
+		}
+	}
+
+	else if (CorrectionMethod == 1)
+	{
+		//CONS: since at this stage we only have one target,
+		//		returning here means not aiming at anyone else
+		//PROS: very cheap to do as we do all the correction checks for 1 entity only (the one closest to us or the closest to the fov)
+
+		Target_t out = *std::min_element(Targets.begin(), Targets.end(), [&](const Target_t &a, const Target_t &b) -> bool {
+			return ((is_melee && AimAtClosest) ? (a.dist < b.dist) : (a.fov < b.fov));
+		});
+
+		if (!CorrectAimPos(pLocal, wep, cmd, out))
+			return {};
+
+		if (is_melee && InRangeOnly && !Utils::CanMeleeHit(wep, out.ang_to_ent, out.ptr->GetIndex()))
+			return {};
+
+		return out;
 	}
 
 	return {};
@@ -524,19 +543,6 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
-		if (CorrectionMethod == 1)
-		{
-			if (!CorrectAimPos(pLocal, pLocalWeapon, cmd, target)) {
-				SmoothStartTime = gInts.Globals->curtime; //play a game and count how many times I reset these :^)
-				SmoothStartAngle = cmd->viewangles;
-				return;
-
-				//CONS: since at this stage we only have one target,
-				//		returning here means not aiming at someone else
-				//PROS: very cheap to do as we do all the correction checks for 1 entity only
-			}
-		}
-
 		int wep_idx = pLocalWeapon->GetItemDefinitionIndex();
 		static int old_wep_idx = wep_idx;
 
