@@ -108,10 +108,17 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 		if (!CorrectAimPos(pLocal, wep, cmd, out))
 			return {};
 
-		if (is_melee && InRangeOnly && !Utils::CanMeleeHit(wep, out.ang_to_ent, out.ptr->GetIndex()))
-			return {};
+		if (is_melee)
+		{
+			if (InRangeOnly && !Utils::CanMeleeHit(wep, out.ang_to_ent, out.ptr->GetIndex()))
+				return {};
 
-		return out;
+			if (AimAtClosest)
+				return out;
+		}
+
+		if (out.fov < AimFov)
+			return out;
 	}
 
 	return {};
