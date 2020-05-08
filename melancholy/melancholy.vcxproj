@@ -187,6 +187,7 @@
     <ClCompile Include="SDK\Interfaces\CHLClient\CHLClient.cpp" />
     <ClCompile Include="SDK\Interfaces\CModelInfo\CModelInfo.cpp" />
     <ClCompile Include="SDK\Interfaces\CModelRender\CModelRender.cpp" />
+    <ClCompile Include="SDK\Interfaces\ConVar\ConVar.cpp" />
     <ClCompile Include="SDK\Interfaces\IEngineTrace\IEngineTrace.cpp" />
     <ClCompile Include="SDK\Interfaces\IEngineVGui\IEngineVGui.cpp" />
     <ClCompile Include="SDK\Interfaces\IMaterialSystem\IMaterialSystem.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="SDK\Interfaces\CHLClient\CHLClient.h" />
     <ClInclude Include="SDK\Interfaces\CModelInfo\CModelInfo.h" />
     <ClInclude Include="SDK\Interfaces\CModelRender\CModelRender.h" />
+    <ClInclude Include="SDK\Interfaces\ConVar\ConVar.h" />
     <ClInclude Include="SDK\Interfaces\CRenderView\CRenderView.h" />
     <ClInclude Include="SDK\Interfaces\IEngineTrace\IEngineTrace.h" />
     <ClInclude Include="SDK\Interfaces\IEngineVGui\IEngineVGui.h" />
@@ -258,6 +260,7 @@
     <ClInclude Include="SDK\Interfaces\IPanel\IPanel.h" />
     <ClInclude Include="SDK\Interfaces\IPrediction\IPrediction.h" />
     <ClInclude Include="SDK\Interfaces\ISurface\ISurface.h" />
+    <ClInclude Include="SDK\Interfaces\NetChannel\NetChannel.h" />
     <ClInclude Include="SDK\SDK.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

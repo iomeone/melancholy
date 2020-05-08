@@ -138,9 +138,12 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		if (!ProjectileAim)
 			return false;
 
+		static ConVar *sv_gravity = gInts.ConVars->FindVar("sv_gravity");
+		Vec3 gravity = Vec3(0.0f, 0.0f, (sv_gravity->GetFloat())); //TODO: handle target.ptr->GetCond() & TFCondEx2_Parachute
+
 		int local_class			 = pLocal->GetClassNum();
 		Vec3 target_velocity	 = (IsTargetPlayer ? target.ptr->GetVelocity() : Vec3(0.0f, 0.0f, 0.0f));
-		Vec3 target_acceleration = (IsTargetPlayer ? Vec3(0.0f, 0.0f, 800.0f) : Vec3(0.0f, 0.0f, 0.0f));
+		Vec3 target_acceleration = (IsTargetPlayer ? gravity : Vec3(0.0f, 0.0f, 0.0f));
 		bool target_onground	 = (IsTargetPlayer ? target.ptr->IsOnGround() : true);
 
 		if (local_class == TF2_Demoman) {
@@ -163,18 +166,19 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
 
 		//post pred corrections
-		if (local_class == TF2_Demoman && IsTargetPlayer) {
-			//Idk how to correct pipes :(
-			Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-			Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
-			Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 50.0f));
-			Math::VectorAngles(vecVelocity, target.ang_to_ent);
+		//if (local_class == TF2_Demoman && IsTargetPlayer)
+		//{
+		//	//Idk how to correct pipes :(
+		//	/*Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+		//	Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
+		//	Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 50.0f));
+		//	Math::VectorAngles(vecVelocity, target.ang_to_ent);*/
 
-			//the game launches the pipes with ((vecForward * ProjectileInfo.speed) + (vecUp * 200.0f));
-			//but correcting the final angles with ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f)); doesn't do much good
-			//so just using (- (up * 50)) atm, the results are still far from desirable,
-			//but I think the solver itself has something to do with it
-		}
+		//	//the game launches the pipes with ((vecForward * ProjectileInfo.speed) + (vecUp * 200.0f));
+		//	//but correcting the final angles with ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f)); doesn't do much good
+		//	//so just using (- (up * 50)) atm, the results are still far from desirable,
+		//	//but I think the solver itself has something to do with it
+		//}
 
 		target.fov = Math::CalcFov(cmd->viewangles, target.ang_to_ent);
 	}

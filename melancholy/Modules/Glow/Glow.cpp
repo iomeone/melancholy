@@ -2,6 +2,9 @@
 
 void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 {
+	static ConVar *glow_outline_effect_enable = gInts.ConVars->FindVar("glow_outline_effect_enable");
+	glow_outline_effect_enable->SetValue(Active ? 1 : 0);
+
 	//main glow handling
 	if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
 	{

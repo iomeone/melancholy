@@ -168,6 +168,12 @@
     <Filter Include="Header Files\Hooks\LevelInit">
       <UniqueIdentifier>{d2f95984-2060-4541-ae3b-d529106a12d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\ConVar">
+      <UniqueIdentifier>{ee4d06d9-e433-4c72-94a8-8f546c6755f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SDK\Interfaces\NetChannel">
+      <UniqueIdentifier>{30a9791e-d586-4523-a336-cf8dafb5fecc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -313,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="Hooks\LevelInit\LevelInit.cpp">
       <Filter>Header Files\Hooks\LevelInit</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\Interfaces\ConVar\ConVar.cpp">
+      <Filter>Header Files\SDK\Interfaces\ConVar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -498,6 +507,12 @@
     </ClInclude>
     <ClInclude Include="Hooks\LevelInit\LevelInit.h">
       <Filter>Header Files\Hooks\LevelInit</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\ConVar\ConVar.h">
+      <Filter>Header Files\SDK\Interfaces\ConVar</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\Interfaces\NetChannel\NetChannel.h">
+      <Filter>Header Files\SDK\Interfaces\NetChannel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

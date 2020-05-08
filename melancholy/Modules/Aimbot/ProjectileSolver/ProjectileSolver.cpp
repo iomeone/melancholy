@@ -139,8 +139,7 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 //-------------------------------------------------- CPredictor
 
 Vec3 CPredictor::PredictPosition(float time, const Vec3 &pos, const Vec3 &vel, const Vec3 &accel, bool on_ground) const {
-	//use linear pred if the target is on ground
-	return (on_ground ? (pos + (vel * time)) : (pos + (vel * time) - accel * time * time * 0.5f));
+	return (on_ground ? (pos + (vel * time)) : (pos + (vel * time) - accel * 0.5f * time * time + std::max(1.0f, time * 0.4f)));
 }
 
 //-------------------------------------------------- Solver
@@ -194,15 +193,22 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 	CTraceFilterNoPlayers filter;
 	filter.pSkip = target.ptr;
 
+	INetChannelInfo *net_chan = reinterpret_cast<INetChannelInfo *>(gInts.Engine->GetNetChannelInfo());
+	static ConVar *cl_interp = gInts.ConVars->FindVar("cl_interp");
+
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
 	{
-		Vec3 predicted_pos = target.PredictPosition(target_time, target.origin, target.velocity, target.gravity, on_ground);
+		float interp	= cl_interp->GetFloat();
+		float latency	= (net_chan->GetLatency(FLOW_OUTGOING) + net_chan->GetLatency(FLOW_INCOMING));
+		float time		= (interp + latency + target_time);
+
+		Vec3 predicted_pos = target.PredictPosition(time, target.origin, target.velocity, target.gravity, on_ground);
 
 		ray.Init(target.origin, predicted_pos);
 		gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
 		if (trace.DidHit())
-			predicted_pos.z = (trace.endpos.z + target.ptr->GetViewOffset().z);
+			predicted_pos.z = (trace.endpos.z + (target.ptr->GetViewOffset().z * 0.5f));
 
 		if (!Solve2D(origin, weapon, predicted_pos, sol))
 			return false;

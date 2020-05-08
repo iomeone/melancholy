@@ -1,6 +1,9 @@
 #include "Interfaces.h"
 
-void Interfaces_t::Initialize() {
+//TODO: add fail checks
+
+void Interfaces_t::Initialize()
+{
 	Engine			= reinterpret_cast<CEngineClient *>			(gInterface.Get("engine.dll", "VEngineClient013"));
 	EntityList		= reinterpret_cast<CEntityList *>			(gInterface.Get("client.dll", "VClientEntityList003"));
 	Globals			= *reinterpret_cast<CGlobals **>			(gPattern.FindInEngine("A1 ? ? ? ? 8B 11 68") + 0x8);
@@ -17,6 +20,7 @@ void Interfaces_t::Initialize() {
 	RenderView		= reinterpret_cast<CRenderView*>			(gInterface.Get("engine.dll", "VEngineRenderView014"));
 	EngineVGui		= reinterpret_cast<IEngineVGui*>			(gInterface.Get("engine.dll", "VEngineVGui001"));
 	GlowObject		= *reinterpret_cast<CGlowObjectManager **>	(gPattern.FindInClient("8B 0D ? ? ? ? A1 ? ? ? ? 56 8B 37") + 0x2);
+	ConVars			= reinterpret_cast<ICvar*>					(gInterface.Get("vstdlib.dll", "VEngineCvar004"));
 	DXDevice		= **reinterpret_cast<DWORD **>				(gPattern.FindInModule("shaderapidx9.dll", "A1 ?? ?? ?? ?? 50 8B 08 FF 51 0C") + 0x1);
 }
 

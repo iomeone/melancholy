@@ -15,6 +15,8 @@
 #include "CRenderView/CRenderView.h"
 #include "IEngineVGui/IEngineVGui.h"
 #include "CGlowObjectManager/CGlowObjectManager.h"
+#include "ConVar/ConVar.h"
+#include "NetChannel/NetChannel.h"
 
 struct Interfaces_t {
 	CEngineClient *Engine			= nullptr;
@@ -34,6 +36,7 @@ struct Interfaces_t {
 	CRenderView *RenderView			= nullptr;
 	IEngineVGui *EngineVGui			= nullptr;
 	CGlowObjectManager *GlowObject	= nullptr;
+	ICvar *ConVars					= nullptr;
 
 	DWORD DXDevice = 0x0;
 
