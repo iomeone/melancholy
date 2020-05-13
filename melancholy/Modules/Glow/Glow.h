@@ -3,13 +3,13 @@
 
 class CGlow {
 public:
-	bool Active = false;
+	bool Active = true;
 	float GlowAlpha = 1.0f;
 
-	int PlayerGlow				= 1; //0 off 1 team 2 health 3 caramelldansen
+	int PlayerGlow				= 2; //0 off 1 team 2 health 3 caramelldansen
 	bool NoTeammatePlayers		= true;
 
-	int BuildingGlow			= 1;
+	int BuildingGlow			= 2;
 	bool NoTeammateBuildings	= true;
 
 	void Run(CBaseEntity *pLocal, ClientFrameStage_t frame);

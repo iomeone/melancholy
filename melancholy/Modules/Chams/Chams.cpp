@@ -65,6 +65,7 @@ void CChams::Run()
 					case 0: { color = Utils::GetTeamColor(ent->GetTeamNum()); break; }
 					case 1: { color = Utils::GetHealthColor(ent->GetHealth(), ent->GetMaxHealth()); break; }
 					case 2: { color = Utils::Rainbow(); break; }
+					case 3: { color = RGBA_t(0, 0, 0, 0); }
 				}
 
 				IMaterial *mat = nullptr;
@@ -108,6 +109,7 @@ void CChams::Run()
 					case 0: { color = Utils::GetTeamColor(ent->GetTeamNum()); break; }
 					case 1: { color = Utils::GetHealthColor(obj->GetHealth(), obj->GetMaxHealth()); break; }
 					case 2: { color = Utils::Rainbow(); break; }
+					case 3: { color = RGBA_t(0, 0, 0, 0); }
 				}
 
 				IMaterial *mat = nullptr;

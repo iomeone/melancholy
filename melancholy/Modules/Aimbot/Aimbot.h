@@ -67,7 +67,6 @@ public:
 
 	bool ProjectileAim		= false;
 
-
 	void Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd *cmd);
 };
 

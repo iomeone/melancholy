@@ -589,7 +589,7 @@ void CESP::Run(CBaseEntity *pLocal)
 			int x = ((gScreenSize.w / 2) - (w / 2));
 			int y = (((gScreenSize.h / 2) + 25) + (FontTallSpec * n));
 
-			DrawSpec.String(x, y, ColSpec, s.c_str());
+			DrawSpec.WString(x, y, ColSpec, Utils::ToWC(s.c_str()));
 		}
 	}
 }

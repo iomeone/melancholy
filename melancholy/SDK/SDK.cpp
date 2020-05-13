@@ -263,6 +263,11 @@ int CBaseEntity::GetCondEx()
 	DYNVAR_RETURN(int, this, "DT_TFPlayer", "m_Shared", "m_nPlayerCondEx");
 }
 
+int CBaseEntity::GetCondEx2()
+{
+	DYNVAR_RETURN(int, this, "DT_TFPlayer", "m_Shared", "m_nPlayerCondEx2");
+}
+
 void CBaseEntity::RemoveCond(int cond)
 {
 	static DWORD offset = gNetVars.get_offset("DT_TFPlayer", "m_Shared", "m_nPlayerCond");
@@ -737,6 +742,17 @@ void Draw_t::String(int x, int y, RGBA_t &clr, const char *str, ...)
 	gInts.Surface->PrintText(wstr, wcslen(wstr));
 }
 
+void Draw_t::WString(int x, int y, RGBA_t &clr, const wchar_t *str)
+{
+	if (str == 0)
+		return;
+
+	gInts.Surface->SetTextPos(x, y);
+	gInts.Surface->SetTextFont(dwFont);
+	gInts.Surface->SetTextColor(clr.R(), clr.G(), clr.B(), clr.A());
+	gInts.Surface->PrintText(str, wcslen(str));
+}
+
 void Draw_t::Line(int x, int y, int x1, int y1, RGBA_t &clr)
 {
 	gInts.Surface->SetDrawColor(clr.R(), clr.G(), clr.B(), clr.A());
@@ -799,7 +815,7 @@ CKeyVals gKeyVals;
 //-------------------------------------------------- MatHelper_t
 
 void MatHelper_t::Initialize() {
-	shaded		= CreateMaterial(false, false, false, true);
+	shaded		= CreateMaterial(false, false, false, false);
 	flat		= CreateMaterial(false, true, false, false);
 	wireframe	= CreateMaterial(false, true, true, false);
 }

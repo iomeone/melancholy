@@ -42,6 +42,7 @@ public:
 	const char *szGetClass();
 	int GetCond();
 	int GetCondEx();
+	int GetCondEx2();
 	void RemoveCond(int cond);
 	Vec3 GetCollideableMins();
 	Vec3 GetCollideableMaxs();
@@ -143,6 +144,7 @@ struct Draw_t
 	Draw_t(const char *font, int tall, int weight, int flags);
 
 	void String(int x, int y, RGBA_t &clr, const char *str, ...);
+	void WString(int x, int y, RGBA_t &clr, const wchar_t *str);
 	void Line(int x, int y, int x1, int y1, RGBA_t &clr);
 	void Rect(int x, int y, int w, int h, RGBA_t &clr);
 	void OutlinedRect(int x, int y, int w, int h, RGBA_t &clr);
@@ -228,7 +230,19 @@ namespace Math {
 	}
 }
 
-namespace Utils {
+namespace Utils
+{
+	inline CTFWeaponInfo *GetTFWeaponInfo(int iWeapon)
+	{
+		//TODO: fix me
+	 /*static auto GetTFWeaponInfoFN = reinterpret_cast<CTFWeaponInfo * (__cdecl *)(int)>(gPattern.FindInClient("E8 ? ? ? ? EB 31 51"));
+
+		if (GetTFWeaponInfoFN)
+			return GetTFWeaponInfoFN(iWeapon);*/
+
+		return nullptr;
+	}
+
 	template <typename T>
 	void clamp(T &x, T min, T max)
 	{
@@ -239,24 +253,7 @@ namespace Utils {
 			x = max;
 	}
 
-	typedef void(__cdecl *MsgFn)(const char *msg, va_list);
-	inline void Msg(const char *msg, ...)
-	{
-		if (msg == nullptr)
-			return;
-
-		static MsgFn fn = (MsgFn)GetProcAddress(GetModuleHandle("tier0.dll"), "Msg");
-
-		char buffer[989];
-		va_list list;
-		va_start(list, msg);
-		vsprintf(buffer, msg, list);
-		va_end(list);
-
-		fn(buffer, list);
-	}
-
-	inline RGBA_t Rainbow()
+	inline RGBA_t Rainbow() //TODO: fix me
 	{
 		static uint32_t cnt = 0;
 		float freq = 0.01f;
@@ -279,6 +276,26 @@ namespace Utils {
 		std::wstring wc(length, L'#');
 		mbstowcs(&wc[0], text, length);
 		return wc.c_str();
+	}
+
+	inline std::wstring ConvertStringToWstring(const std::string &str)
+	{
+		if (str.empty())
+			return std::wstring();
+
+		int size = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), str.length(), NULL, 0);
+
+		std::wstring wstrTo;
+
+		if (size)
+		{
+			wstrTo.resize(size);
+
+			if (MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, str.c_str(), str.length(), &wstrTo[0], size))
+				return wstrTo;
+		}
+
+		return std::wstring();
 	}
 
 	inline RGBA_t GetTeamColor(int TeamNum)
@@ -451,8 +468,8 @@ namespace Utils {
 
 		Vec3 vForward = Vec3();
 		Math::AngleVectors(vLocalViewAngles, &vForward);
-
-		Vec3 vTraceStart = pOwner->GetShootPos();
+		
+		Vec3 vTraceStart = (pOwner->GetShootPos() /*+ (pOwner->GetVelocity() * WeaponInfo->GetWeaponData(TF_WEAPON_PRIMARY_MODE).m_flSmackDelay)*/);
 		Vec3 vTraceEnd = (vTraceStart + (vForward * flRange));
 
 		Ray_t ray;

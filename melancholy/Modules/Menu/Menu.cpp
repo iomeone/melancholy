@@ -110,7 +110,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 					static const char *szHitbox[]		= { "head", "body", "auto" };
 					static const char *szSmoothing[]	= { "time", "out expo", "in expo", "in out quad" };
 					static const char *szCorrection[]	= { "expensive", "cheap" };
-
+					
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
 
 					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.7f), true))
@@ -139,7 +139,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 						ImGui::Checkbox("wait for headshot",	&gAimbot.WaitForHS);
 						ImGui::Checkbox("scoped only",			&gAimbot.ScopedOnly);
-
+						
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
 					}
@@ -426,7 +426,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						{
 							static const char *szChams[]		= { "off", "shaded", "flat", "wireframe" };
 							static const char *szChamsMode[]	= { "visible", "invisible", "always" };
-							static const char *szChamColor[]	= { "team", "health", "caramelldansen" };
+							static const char *szChamColor[]	= { "team", "health", "caramelldansen", "void" };
 							static const char *szChamClrPkup[]	= { "pickup", "caramelldansen" };
 
 							ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);

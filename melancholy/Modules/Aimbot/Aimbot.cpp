@@ -131,30 +131,31 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 	CProjectileWeapon ProjectileWep(wep);
 	ProjectileInfo_t ProjectileInfo = ProjectileWep.GetWeaponInfo();
 
-	//don't we also want multipoint with projectiles :thinking:
-	//I guess not, for now
 	if (ProjectileInfo.speed > 0.0f)
 	{
 		if (!ProjectileAim)
 			return false;
 
 		static ConVar *sv_gravity = gInts.ConVars->FindVar("sv_gravity");
-		Vec3 gravity = Vec3(0.0f, 0.0f, (sv_gravity->GetFloat())); //TODO: handle target.ptr->GetCond() & TFCondEx2_Parachute
+		Vec3 gravity = Vec3(0.0f, 0.0f, (sv_gravity->GetFloat()));
 
 		int local_class			 = pLocal->GetClassNum();
 		Vec3 target_velocity	 = (IsTargetPlayer ? target.ptr->GetVelocity() : Vec3(0.0f, 0.0f, 0.0f));
-		Vec3 target_acceleration = (IsTargetPlayer ? gravity : Vec3(0.0f, 0.0f, 0.0f));
+		Vec3 target_acceleration = (IsTargetPlayer ? (gravity * ((target.ptr->GetCondEx2() & TFCondEx2_Parachute) ? 0.224f : 1.0f)) : Vec3(0.0f, 0.0f, 0.0f));
 		bool target_onground	 = (IsTargetPlayer ? target.ptr->IsOnGround() : true);
 
-		if (local_class == TF2_Demoman) {
-			/*Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-			Math::AngleVectors(cmd->viewangles, &vecForward, &vecRight, &vecUp);
-			target.local_pos += ((vecForward * 16.0f) + (vecRight * 8.0f) + (vecUp * -6.0f));*/
-			target.ent_pos.z -= (IsTargetPlayer ? (!target_onground && target_velocity.z < 0.0f ? 50.0f : 30.0f) : 3.0f);
-		}
+		switch (local_class)
+		{
+			case TF2_Soldier: {
+				target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+				break;
+			}
 
-		else if (local_class == TF2_Soldier) {
-			target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+			case TF2_Demoman: {
+				//target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+				target.ent_pos.z -= (IsTargetPlayer ? (!target_onground && target_velocity.z < 0.0f ? 50.0f : 30.0f) : 0.0f);
+				break;
+			}
 		}
 
 		CPredictor Predictor(target.ent_pos, target_velocity, target_acceleration, target.ptr);
@@ -165,21 +166,16 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 
 		target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
 
-		//post pred corrections
+		////post pred corrections
 		//if (local_class == TF2_Demoman && IsTargetPlayer)
 		//{
-		//	//Idk how to correct pipes :(
-		//	/*Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+		//	Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
 		//	Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
-		//	Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 50.0f));
-		//	Math::VectorAngles(vecVelocity, target.ang_to_ent);*/
-
-		//	//the game launches the pipes with ((vecForward * ProjectileInfo.speed) + (vecUp * 200.0f));
-		//	//but correcting the final angles with ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f)); doesn't do much good
-		//	//so just using (- (up * 50)) atm, the results are still far from desirable,
-		//	//but I think the solver itself has something to do with it
+		//	Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f));
+		//	Math::VectorAngles(vecVelocity, target.ang_to_ent);
+		//	target.ang_to_ent.x -= Math::MapFloat(gLocalInfo.PredEnd.DistTo(target.local_pos), 3700.0f, 0.0f, 35.0f, 0.0f);
 		//}
-
+		
 		target.fov = Math::CalcFov(cmd->viewangles, target.ang_to_ent);
 	}
 

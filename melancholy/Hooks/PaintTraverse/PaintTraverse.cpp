@@ -41,7 +41,9 @@ void __fastcall PaintTraverse::Hook(void *panels, int edx, unsigned int vgui_pan
 		CBaseEntity *local = gInts.EntityList->GetClientEntity(gInts.Engine->GetLocalPlayer());
 
 		if (local && local->IsAlive())
+		{
 			local->ForceTauntCam(gESP.Thirdperson);
+		}
 
 		gESP.Run(local);
 

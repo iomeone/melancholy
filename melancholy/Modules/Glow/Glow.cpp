@@ -73,6 +73,11 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 
 				if (GlowEnt->IsPlayer())
 				{
+					if (NoTeammatePlayers && GlowEnt->GetTeamNum() == pLocal->GetTeamNum()) { //respawn glows fix
+						GlowObject.m_flGlowAlpha = 0.0f;
+						continue;
+					}
+
 					switch (PlayerGlow)
 					{
 						case 0: { GlowCol = Vec3(); break; }
@@ -84,6 +89,11 @@ void CGlow::Run(CBaseEntity *pLocal, ClientFrameStage_t frame)
 
 				else if (GlowEnt->IsBuilding())
 				{
+					if (NoTeammateBuildings && GlowEnt->GetTeamNum() == pLocal->GetTeamNum()) {
+						GlowObject.m_flGlowAlpha = 0.0f;
+						continue;
+					}
+
 					CObject *obj = reinterpret_cast<CObject *>(GlowEnt);
 
 					if (obj)

@@ -2072,3 +2072,236 @@ public: // members are public to avoid to much changes
 
 #define TIME_TO_TICKS( dt )		( (int)( 0.5f + (float)(dt) / gInts.Globals->interval_per_tick ) )
 #define TICKS_TO_TIME( t )		( gInts.Globals->interval_per_tick *( t ) )
+
+#define MAX_WEAPON_STRING		80
+#define MAX_WEAPON_PREFIX		16
+#define MAX_WEAPON_AMMO_NAME	32
+
+typedef enum {
+	EMPTY,
+	SINGLE,
+	SINGLE_NPC,
+	WPN_DOUBLE,
+	DOUBLE_NPC,
+	BURST,
+	RELOAD,
+	RELOAD_NPC,
+	MELEE_MISS,
+	MELEE_HIT,
+	MELEE_HIT_WORLD,
+	SPECIAL1,
+	SPECIAL2,
+	SPECIAL3,
+	TAUNT,
+	DEPLOY,
+	NUM_SHOOT_SOUND_TYPES
+} WeaponSound_t;
+
+struct WeaponData_t {
+	int			m_nDamage;
+	int			m_nBulletsPerShot;
+	float		m_flRange;
+	float		m_flSpread;
+	float		m_flPunchAngle;
+	float		m_flTimeFireDelay;		// Time to delay between firing
+	float		m_flTimeIdle;			// Time to idle after firing
+	float		m_flTimeIdleEmpty;		// Time to idle after firing last bullet in clip
+	float		m_flTimeReloadStart;	// Time to start into a reload (ie. shotgun)
+	float		m_flTimeReload;			// Time to reload
+	bool		m_bDrawCrosshair;		// Should the weapon draw a crosshair
+	int			m_iProjectile;			// The type of projectile this mode fires
+	int			m_iAmmoPerShot;			// How much ammo each shot consumes
+	float		m_flProjectileSpeed;	// Start speed for projectiles (nail, etc.); NOTE: union with something non-projectile
+	float		m_flSmackDelay;			// how long after swing should damage happen for melee weapons
+	bool		m_bUseRapidFireCrits;
+};
+
+class FileWeaponInfo_t {
+public:
+	FileWeaponInfo_t();
+	virtual void Parse(void *pKeyValuesData, const char *szWeaponName);
+
+public:
+	bool	bParsedScript;
+	bool	bLoadedHudElements;		 
+	char	szClassName[MAX_WEAPON_STRING];
+	char	szPrintName[MAX_WEAPON_STRING];
+	char	szViewModel[MAX_WEAPON_STRING];
+	char	szWorldModel[MAX_WEAPON_STRING];
+	char	szAnimationPrefix[MAX_WEAPON_PREFIX];
+	int		iSlot;
+	int		iPosition;
+	int		iMaxClip1;
+	int		iMaxClip2;
+	int		iDefaultClip1;
+	int		iDefaultClip2;
+	int		iWeight;
+	int		iRumbleEffect;
+	bool	bAutoSwitchTo;
+	bool	bAutoSwitchFrom;
+	int		iFlags;
+	char	szAmmo1[MAX_WEAPON_AMMO_NAME];
+	char	szAmmo2[MAX_WEAPON_AMMO_NAME];
+	char	aShootSounds[NUM_SHOOT_SOUND_TYPES][MAX_WEAPON_STRING];
+	int		iAmmoType;
+	int		iAmmo2Type;
+	bool	m_bMeleeWeapon;
+	bool	m_bBuiltRightHanded;
+	bool	m_bAllowFlipping;
+	int		iSpriteCount;
+	void	*iconActive;
+	void	*iconInactive;
+	void	*iconAmmo;
+	void	*iconAmmo2;
+	void	*iconCrosshair;
+	void	*iconAutoaim;
+	void	*iconZoomedCrosshair;
+	void	*iconZoomedAutoaim;
+	void	*iconSmall;
+	bool	bShowUsageHint;
+};
+
+class CTFWeaponInfo : public FileWeaponInfo_t {
+public:
+	CTFWeaponInfo();
+	~CTFWeaponInfo();
+
+	virtual void Parse(void *pKeyValuesData, const char *szWeaponName);
+
+	WeaponData_t const &GetWeaponData(int iWeapon) const { return m_WeaponData[iWeapon]; }
+
+public:
+	WeaponData_t	m_WeaponData[2];
+	int				m_iWeaponType;
+	bool			m_bGrenade;
+	float			m_flDamageRadius;
+	float			m_flPrimerTime;
+	bool			m_bLowerWeapon;
+	bool			m_bSuppressGrenTimer;
+	bool			m_bHasTeamSkins_Viewmodel;
+	bool			m_bHasTeamSkins_Worldmodel;
+	char			m_szMuzzleFlashModel[128];
+	float			m_flMuzzleFlashModelDuration;
+	char			m_szMuzzleFlashParticleEffect[128];
+	char			m_szTracerEffect[128];
+	bool			m_bDoInstantEjectBrass;
+	char			m_szBrassModel[128];
+	char			m_szExplosionSound[128];
+	char			m_szExplosionEffect[128];
+	char			m_szExplosionPlayerEffect[128];
+	char			m_szExplosionWaterEffect[128];
+	bool			m_bDontDrop;
+};
+
+enum ETFWeaponType {
+	TF_WEAPON_NONE = 0,
+	TF_WEAPON_BAT,
+	TF_WEAPON_BAT_WOOD,
+	TF_WEAPON_BOTTLE,
+	TF_WEAPON_FIREAXE,
+	TF_WEAPON_CLUB,
+	TF_WEAPON_CROWBAR,
+	TF_WEAPON_KNIFE,
+	TF_WEAPON_FISTS,
+	TF_WEAPON_SHOVEL,
+	TF_WEAPON_WRENCH,
+	TF_WEAPON_BONESAW,
+	TF_WEAPON_SHOTGUN_PRIMARY,
+	TF_WEAPON_SHOTGUN_SOLDIER,
+	TF_WEAPON_SHOTGUN_HWG,
+	TF_WEAPON_SHOTGUN_PYRO,
+	TF_WEAPON_SCATTERGUN,
+	TF_WEAPON_SNIPERRIFLE,
+	TF_WEAPON_MINIGUN,
+	TF_WEAPON_SMG,
+	TF_WEAPON_SYRINGEGUN_MEDIC,
+	TF_WEAPON_TRANQ,
+	TF_WEAPON_ROCKETLAUNCHER,
+	TF_WEAPON_GRENADELAUNCHER,
+	TF_WEAPON_PIPEBOMBLAUNCHER,
+	TF_WEAPON_FLAMETHROWER,
+	TF_WEAPON_GRENADE_NORMAL,
+	TF_WEAPON_GRENADE_CONCUSSION,
+	TF_WEAPON_GRENADE_NAIL,
+	TF_WEAPON_GRENADE_MIRV,
+	TF_WEAPON_GRENADE_MIRV_DEMOMAN,
+	TF_WEAPON_GRENADE_NAPALM,
+	TF_WEAPON_GRENADE_GAS,
+	TF_WEAPON_GRENADE_EMP,
+	TF_WEAPON_GRENADE_CALTROP,
+	TF_WEAPON_GRENADE_PIPEBOMB,
+	TF_WEAPON_GRENADE_SMOKE_BOMB,
+	TF_WEAPON_GRENADE_HEAL,
+	TF_WEAPON_GRENADE_STUNBALL,
+	TF_WEAPON_GRENADE_JAR,
+	TF_WEAPON_GRENADE_JAR_MILK,
+	TF_WEAPON_PISTOL,
+	TF_WEAPON_PISTOL_SCOUT,
+	TF_WEAPON_REVOLVER,
+	TF_WEAPON_NAILGUN,
+	TF_WEAPON_PDA,
+	TF_WEAPON_PDA_ENGINEER_BUILD,
+	TF_WEAPON_PDA_ENGINEER_DESTROY,
+	TF_WEAPON_PDA_SPY,
+	TF_WEAPON_BUILDER,
+	TF_WEAPON_MEDIGUN,
+	TF_WEAPON_GRENADE_MIRVBOMB,
+	TF_WEAPON_FLAMETHROWER_ROCKET,
+	TF_WEAPON_GRENADE_DEMOMAN,
+	TF_WEAPON_SENTRY_BULLET,
+	TF_WEAPON_SENTRY_ROCKET,
+	TF_WEAPON_DISPENSER,
+	TF_WEAPON_INVIS,
+	TF_WEAPON_FLAREGUN,
+	TF_WEAPON_LUNCHBOX,
+	TF_WEAPON_JAR,
+	TF_WEAPON_COMPOUND_BOW,
+	TF_WEAPON_BUFF_ITEM,
+	TF_WEAPON_PUMPKIN_BOMB,
+	TF_WEAPON_SWORD,
+	TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT,
+	TF_WEAPON_LIFELINE,
+	TF_WEAPON_LASER_POINTER,
+	TF_WEAPON_DISPENSER_GUN,
+	TF_WEAPON_SENTRY_REVENGE,
+	TF_WEAPON_JAR_MILK,
+	TF_WEAPON_HANDGUN_SCOUT_PRIMARY,
+	TF_WEAPON_BAT_FISH,
+	TF_WEAPON_CROSSBOW,
+	TF_WEAPON_STICKBOMB,
+	TF_WEAPON_HANDGUN_SCOUT_SECONDARY,
+	TF_WEAPON_SODA_POPPER,
+	TF_WEAPON_SNIPERRIFLE_DECAP,
+	TF_WEAPON_RAYGUN,
+	TF_WEAPON_PARTICLE_CANNON,
+	TF_WEAPON_MECHANICAL_ARM,
+	TF_WEAPON_DRG_POMSON,
+	TF_WEAPON_BAT_GIFTWRAP,
+	TF_WEAPON_GRENADE_ORNAMENT_BALL,
+	TF_WEAPON_FLAREGUN_REVENGE,
+	TF_WEAPON_PEP_BRAWLER_BLASTER,
+	TF_WEAPON_CLEAVER,
+	TF_WEAPON_GRENADE_CLEAVER,
+	TF_WEAPON_STICKY_BALL_LAUNCHER,
+	TF_WEAPON_GRENADE_STICKY_BALL,
+	TF_WEAPON_SHOTGUN_BUILDING_RESCUE,
+	TF_WEAPON_CANNON,
+	TF_WEAPON_THROWABLE,
+	TF_WEAPON_GRENADE_THROWABLE,
+	TF_WEAPON_PDA_SPY_BUILD,
+	TF_WEAPON_GRENADE_WATERBALLOON,
+	TF_WEAPON_HARVESTER_SAW,
+	TF_WEAPON_SPELLBOOK,
+	TF_WEAPON_SPELLBOOK_PROJECTILE,
+	TF_WEAPON_SNIPERRIFLE_CLASSIC,
+	TF_WEAPON_PARACHUTE,
+	TF_WEAPON_GRAPPLINGHOOK,
+	TF_WEAPON_PASSTIME_GUN,
+#ifdef STAGING_ONLY
+	TF_WEAPON_SNIPERRIFLE_REVOLVER,
+#endif
+	TF_WEAPON_COUNT
+};
+
+#define TF_WEAPON_PRIMARY_MODE      0
+#define TF_WEAPON_SECONDARY_MODE    1

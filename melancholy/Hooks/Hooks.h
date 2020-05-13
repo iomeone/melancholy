@@ -15,14 +15,14 @@
 
 struct Hooks_t
 {
-	VMTBaseManager *ClientModeHook	= nullptr;
-	VMTBaseManager *DirectXHook		= nullptr;
-	VMTBaseManager *PanelsHook		= nullptr;
-	VMTBaseManager *SurfaceHook		= nullptr;
-	VMTBaseManager *ModelRenderHook	= nullptr;
-	VMTBaseManager *RenderViewHook	= nullptr;
-	VMTBaseManager *PredictionHook	= nullptr;
-	VMTBaseManager *ClientHook		= nullptr;
+	VMTBaseManager *ClientModeHook		= nullptr;
+	VMTBaseManager *DirectXHook			= nullptr;
+	VMTBaseManager *PanelsHook			= nullptr;
+	VMTBaseManager *SurfaceHook			= nullptr;
+	VMTBaseManager *ModelRenderHook		= nullptr;
+	VMTBaseManager *RenderViewHook		= nullptr;
+	VMTBaseManager *PredictionHook		= nullptr;
+	VMTBaseManager *ClientHook			= nullptr;
 
 	void Initialize();
 };
