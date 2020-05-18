@@ -8,6 +8,8 @@ private:
 
 public:
 	bool Bunnyhop = true;
+	ConVar *cheats = nullptr;
+	int timescale = 1;
 
 	void Run(CBaseEntity *pLocal, CUserCmd *cmd);
 };

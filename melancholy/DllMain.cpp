@@ -7,6 +7,10 @@ DWORD WINAPI MainThread(LPVOID lpParam)
 	gHooks.Initialize();
 	gMatHelper.Initialize();
 
+	//TODO: have all the used convars in one place and initialize them there
+	if (!gMisc.cheats)
+		gMisc.cheats = gInts.ConVars->FindVar("sv_cheats");
+
 	return 0x0;
 }
 

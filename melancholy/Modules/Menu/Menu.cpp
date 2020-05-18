@@ -103,6 +103,7 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 				Utils::clamp(gESP.CustomFOV, 70, 130);
 				Utils::clamp(gAimbot.AimFov, 1.0f, 180.0f);
 				Utils::clamp(gAimbot.MpScale, 0.55f, 0.95f);
+				Utils::clamp(gMisc.timescale, 1, 14);
 
 				if (ImGui::BeginTabItem("aimbot"))
 				{
@@ -272,8 +273,8 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 					static const char *szBar[]			= { "off", "vertical", "horizontal" };
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
-
-					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 3.0f), true))
+					
+					if (ImGui::BeginChild("main_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 2.9f), true))
 					{
 						ImGui::Text("main");
 						ImGui::PushItemWidth(90.0f);
@@ -297,6 +298,13 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
 
 						ImGui::Checkbox("highlight target", &gESP.HighlightTarget);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						
+						if (ImGui::Button("hud_reloadscheme", ImVec2(static_cast<float>(windowW) / 3.43f, 20.0f)))
+							gInts.Engine->ClientCmd_Unrestricted("hud_reloadscheme"); //x)
 
 						ImGui::PopItemWidth();
 						ImGui::EndChild();
@@ -598,6 +606,29 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 						ImGui::Checkbox("bunnyhop", &gMisc.Bunnyhop);
 
+						ImGui::EndChild();
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::BeginChild("other_child", ImVec2(static_cast<float>(windowW) / 3.15f, static_cast<float>(windowH) / 4.0f), true))
+					{
+						ImGui::Text("other");
+						ImGui::PushItemWidth(100.0f);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
+						if (gMisc.cheats) {
+							if (ImGui::Button(gMisc.cheats->GetInt() ? "sv_cheats 1" : "sv_cheats 0", ImVec2(100.0f, 20.0f))) {
+								gMisc.cheats->SetValue(!gMisc.cheats->GetInt());
+							}
+						}
+						
+						ImGui::SliderInt("timescale", &gMisc.timescale, 1, 14);
+
+						ImGui::PopItemWidth();
 						ImGui::EndChild();
 					}
 

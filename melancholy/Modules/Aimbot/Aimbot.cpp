@@ -7,7 +7,7 @@ int OldAimPoint			= -1;		//used for reseting smoothing
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
-	Targets.reserve(12); //not a problem if there's more
+	Targets.reserve(12);
 
 	if (!Targets.empty())
 		Targets.clear();
@@ -64,6 +64,9 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 		float fov		= Math::CalcFov(LocalAngles, ang_to_ent);
 		float dist		= ent_pos.DistTo(LocalPos);
 
+		if ((!is_melee || is_melee && !AimAtClosest) && fov > AimFov)
+			continue; //optimization?
+
 		Targets.emplace_back(Target_t{ ent, fov, dist, ang_to_ent, ent_pos, LocalPos });
 	}
 
@@ -97,13 +100,13 @@ CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep
 
 	else if (CorrectionMethod == 1)
 	{
-		//CONS: since at this stage we only have one target,
-		//		returning here means not aiming at anyone else
-		//PROS: very cheap to do as we do all the correction checks for 1 entity only (the one closest to us or the closest to the fov)
-
 		Target_t out = *std::min_element(Targets.begin(), Targets.end(), [&](const Target_t &a, const Target_t &b) -> bool {
 			return ((is_melee && AimAtClosest) ? (a.dist < b.dist) : (a.fov < b.fov));
 		});
+
+		//CONS: since at this stage we only have one target,
+		//		returning here means not aiming at anyone else
+		//PROS: very cheap to do as we do all the correction checks for 1 entity only (the one closest to us or the closest to the fov)
 
 		if (!CorrectAimPos(pLocal, wep, cmd, out))
 			return {};
@@ -167,14 +170,15 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
 
 		////post pred corrections
-		//if (local_class == TF2_Demoman && IsTargetPlayer)
-		//{
-		//	Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-		//	Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
-		//	Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f));
-		//	Math::VectorAngles(vecVelocity, target.ang_to_ent);
-		//	target.ang_to_ent.x -= Math::MapFloat(gLocalInfo.PredEnd.DistTo(target.local_pos), 3700.0f, 0.0f, 35.0f, 0.0f);
-		//}
+		/*if (local_class == TF2_Demoman && IsTargetPlayer)
+		{
+			Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+			Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
+			float flThing = (target.local_pos.DistTo(target.ent_pos) / ProjectileInfo.speed);
+			float flUp = Math::MapFloat(flThing, 0.6f, 60.0f, 0.0f, 200.0f);
+			Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * flUp));
+			Math::VectorAngles(vecVelocity, target.ang_to_ent);
+		}*/
 		
 		target.fov = Math::CalcFov(cmd->viewangles, target.ang_to_ent);
 	}
@@ -348,39 +352,45 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 
 int CAimbot::GetAimHitbox(CBaseEntity *pLocal, CBaseCombatWeapon *wep)
 {
-	if (AimHitbox == 0)
-		return HITBOX_HEAD;
-
-	else if (AimHitbox == 1)
-		return HITBOX_PELVIS;
-
-	else if (AimHitbox == 2)
+	switch (AimHitbox)
 	{
-		int wep_slot = wep->GetSlot();
-
-		if (wep_slot == 2)
-			return HITBOX_BODY;
-
-		int wep_idx = wep->GetItemDefinitionIndex();
-
-		switch (pLocal->GetClassNum())
+		case 0:
+			return HITBOX_HEAD;
+		case 1:
+			return HITBOX_PELVIS;
+		case 2:
 		{
-			case TF2_Sniper:
-				return (wep_slot == 0 ? HITBOX_HEAD : HITBOX_PELVIS);
+			int wep_slot = wep->GetSlot();
 
-			case TF2_Spy:
-				return ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) ? HITBOX_HEAD : HITBOX_PELVIS);
+			if (wep_slot == 2)
+				return HITBOX_BODY;
 
-			default:
-				return HITBOX_PELVIS;
+			int wep_idx = wep->GetItemDefinitionIndex();
+
+			switch (pLocal->GetClassNum())
+			{
+				case TF2_Sniper:
+					return (wep_slot == 0 ? HITBOX_HEAD : HITBOX_PELVIS);
+				case TF2_Spy:
+					return ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) ? HITBOX_HEAD : HITBOX_PELVIS);
+				default:
+					return HITBOX_PELVIS;
+			}
 		}
 	}
 
 	return 0;
 }
 
-bool CAimbot::IsAimKeyDown() {
-	return (AimKey < 1 ? (GetAsyncKeyState(VK_LSHIFT) & 0x8000) : (GetAsyncKeyState(VK_LBUTTON) & 0x8000));
+bool CAimbot::IsAimKeyDown()
+{
+	switch (AimKey)
+	{
+		case 0:
+			return (GetAsyncKeyState(VK_LSHIFT) & 0x8000);
+		case 1:
+			return (GetAsyncKeyState(VK_LBUTTON) & 0x8000);
+	}
 }
 
 void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
@@ -436,7 +446,8 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 	{
 		if (AimMelee && AutoBackstab)
 		{
-			if (Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex())) {
+			if (Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
+			{
 				if (Utils::CanBackstab(cmd->viewangles, target.ptr->GetEyeAngles(), (target.ptr->GetWorldSpaceCenter() - pLocal->GetWorldSpaceCenter())))
 					return true;
 			}
@@ -450,20 +461,26 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 
 	if (wep_slot < 2)
 	{
-		if (class_num == TF2_Sniper) {
-			if (wep_slot == 0 && pLocal->IsScoped() && WaitForHS && !gLocalInfo.CanHeadShot)
-				return false;
-		}
+		if (WaitForHS && !gLocalInfo.CanHeadShot)
+		{
+			if (class_num == TF2_Sniper)
+			{
+				if (wep_slot == 0 && pLocal->IsScoped())
+					return false;
+			}
 
-		else if (class_num == TF2_Spy) {
-			if ((wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador) && WaitForHS && !gLocalInfo.CanHeadShot)
-				return false;
+			else if (class_num == TF2_Spy)
+			{
+				if (wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador)
+					return false;
+			}
 		}
 	}
 
 	else if (wep_slot == 2)
 	{
-		if (AimMelee && !InRangeOnly) {
+		if (AimMelee && !InRangeOnly)
+		{
 			if (!Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
 				return false;
 		}
@@ -499,12 +516,10 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 				//if we're already on a target, shoot even if aim (smooth) hasn't finished
 				if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex())
 				{
-					if (target.ptr->IsPlayer()) {
-						if (GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
-							return false;
-					}
+					if (target.ptr->IsPlayer() && GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
+						return false;
 
-					if ((gInts.Globals->curtime - timer) < 0.065f) //wait a bit so we don't shoot the very edge of the hitbox
+					if ((gInts.Globals->curtime - timer) < 0.05f) //wait a bit (50ms) so we don't shoot the very edge of the hitbox
 						return false;
 				}
 
@@ -540,33 +555,35 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		|| !gInts.Engine->IsConnected()
 		|| !gInts.Engine->IsInGame()
 		|| gInts.Engine->Con_IsVisible()
-		|| gInts.EngineVGui->IsGameUIVisible())
+		|| gInts.EngineVGui->IsGameUIVisible()
+		|| !gInts.ClientMode->IsChatPanelOutOfFocus())
 		return;
 
 	if (!AimMelee && pLocalWeapon->GetSlot() == 2)
 		return;
 
+	int wep_idx = pLocalWeapon->GetItemDefinitionIndex();
+	static int old_wep_idx = wep_idx;
+
+	if (wep_idx != old_wep_idx) {
+		old_wep_idx = wep_idx;
+		SmoothStartTime = gInts.Globals->curtime;
+		SmoothStartAngle = cmd->viewangles;
+	}
+
+	bool is_bow = (wep_idx == Sniper_m_TheHuntsman || wep_idx == Sniper_m_FestiveHuntsman || wep_idx == Sniper_m_TheFortifiedCompound);
+
+	if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped()) && !is_bow) {
+		SmoothStartTime = gInts.Globals->curtime;
+		SmoothStartAngle = cmd->viewangles;
+		return;
+	}
+
 	Target_t target = GetTarget(pLocal, pLocalWeapon, cmd);
 
 	if (target.ptr)
 	{
-		int wep_idx = pLocalWeapon->GetItemDefinitionIndex();
-		static int old_wep_idx = wep_idx;
-
-		if (wep_idx != old_wep_idx) {
-			old_wep_idx = wep_idx;
-			SmoothStartTime = gInts.Globals->curtime;
-			SmoothStartAngle = cmd->viewangles;
-		}
-
-		if (ScopedOnly && (pLocal->GetClassNum() == TF2_Sniper && pLocalWeapon->GetSlot() == 0 && !pLocal->IsScoped()))
-		{
-			if (wep_idx != Sniper_m_TheHuntsman && wep_idx != Sniper_m_FestiveHuntsman && wep_idx != Sniper_m_TheFortifiedCompound) {
-				SmoothStartTime = gInts.Globals->curtime;
-				SmoothStartAngle = cmd->viewangles;
-				return;
-			}
-		}
+		bool should_autoshoot = ShouldAutoshoot(pLocal, pLocalWeapon, target, cmd);
 
 		if (IsAimKeyDown())
 		{
@@ -579,7 +596,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 			SetAngles(pLocal, target, cmd);
 
-			if (ShouldAutoshoot(pLocal, pLocalWeapon, target, cmd))
+			if (should_autoshoot)
 				cmd->buttons |= IN_ATTACK;
 		}
 
