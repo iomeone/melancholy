@@ -519,7 +519,7 @@ bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Targe
 					if (target.ptr->IsPlayer() && GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
 						return false;
 
-					if ((gInts.Globals->curtime - timer) < 0.05f) //wait a bit (50ms) so we don't shoot the very edge of the hitbox
+					if ((gInts.Globals->curtime - timer) < 0.07f) //wait a bit (70ms) so we don't shoot the very edge of the hitbox
 						return false;
 				}
 
@@ -555,8 +555,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 		|| !gInts.Engine->IsConnected()
 		|| !gInts.Engine->IsInGame()
 		|| gInts.Engine->Con_IsVisible()
-		|| gInts.EngineVGui->IsGameUIVisible()
-		|| !gInts.ClientMode->IsChatPanelOutOfFocus())
+		|| gInts.EngineVGui->IsGameUIVisible())
 		return;
 
 	if (!AimMelee && pLocalWeapon->GetSlot() == 2)
@@ -583,8 +582,6 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 	if (target.ptr)
 	{
-		bool should_autoshoot = ShouldAutoshoot(pLocal, pLocalWeapon, target, cmd);
-
 		if (IsAimKeyDown())
 		{
 			gLocalInfo.CurrentTargetIndex = target.ptr->GetIndex();
@@ -596,7 +593,7 @@ void CAimbot::Run(CBaseEntity *pLocal, CBaseCombatWeapon *pLocalWeapon, CUserCmd
 
 			SetAngles(pLocal, target, cmd);
 
-			if (should_autoshoot)
+			if (ShouldAutoshoot(pLocal, pLocalWeapon, target, cmd))
 				cmd->buttons |= IN_ATTACK;
 		}
 
