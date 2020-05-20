@@ -201,6 +201,11 @@ void CMenu::Run(IDirect3DDevice9 *pDevice)
 
 						ImGui::Checkbox("in range only",	&gAimbot.InRangeOnly);
 						ImGui::Checkbox("aim at closest",	&gAimbot.AimAtClosest);
+
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+						ImGui::Separator();
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+
 						ImGui::Checkbox("auto backstab",	&gAimbot.AutoBackstab);
 
 						ImGui::PopItemWidth();

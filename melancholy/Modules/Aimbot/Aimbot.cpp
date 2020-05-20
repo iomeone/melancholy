@@ -147,15 +147,23 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		Vec3 target_acceleration = (IsTargetPlayer ? (gravity * ((target.ptr->GetCondEx2() & TFCondEx2_Parachute) ? 0.224f : 1.0f)) : Vec3(0.0f, 0.0f, 0.0f));
 		bool target_onground	 = (IsTargetPlayer ? target.ptr->IsOnGround() : true);
 
+		static ConVar *cl_flipviewmodels = gInts.ConVars->FindVar("cl_flipviewmodels");
+		bool is_vm_flipped = (cl_flipviewmodels->GetInt() ? true : false);
+
 		switch (local_class)
 		{
 			case TF2_Soldier: {
+				Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+				Math::AngleVectors(cmd->viewangles, &vecForward, &vecRight, &vecUp);
+				Vec3 vecOffset = Vec3(23.5f, (is_vm_flipped ? -12.0f : 12.0f), (pLocal->IsDucking() ? 8.0f : -3.0f));
+				target.local_pos += (vecForward * vecOffset.x) + (vecRight * vecOffset.y) + (vecUp * vecOffset.z);
 				target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
 				break;
 			}
 
 			case TF2_Demoman: {
-				//target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+				//Vec3 vecOffset = Vec3(16.0f, (is_vm_flipped ? -6.0f : 6.0f /*8.0f in the game code but it's wrong?*/), -6.0f);
+				//target.local_pos += (vecForward * vecOffset.x) + (vecRight * vecOffset.y) + (vecUp * vecOffset.z);
 				target.ent_pos.z -= (IsTargetPlayer ? (!target_onground && target_velocity.z < 0.0f ? 50.0f : 30.0f) : 0.0f);
 				break;
 			}
@@ -438,95 +446,102 @@ void CAimbot::SetAngles(CBaseEntity *pLocal, Target_t &target, CUserCmd *cmd)
 
 bool CAimbot::ShouldAutoshoot(CBaseEntity *pLocal, CBaseCombatWeapon *wep, Target_t &target, CUserCmd *cmd)
 {
-	int wep_slot	= wep->GetSlot();
-	int wep_idx		= wep->GetItemDefinitionIndex();
-	int class_num	= pLocal->GetClassNum();
+	int wep_slot = wep->GetSlot();
+	int class_num = pLocal->GetClassNum();
 
 	if (class_num == TF2_Spy && wep_slot == 2 && target.ptr->IsPlayer())
 	{
-		if (AimMelee && AutoBackstab)
-		{
-			if (Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
-			{
-				if (Utils::CanBackstab(cmd->viewangles, target.ptr->GetEyeAngles(), (target.ptr->GetWorldSpaceCenter() - pLocal->GetWorldSpaceCenter())))
-					return true;
-			}
-			
+		if (!AutoBackstab)
 			return false;
-		}
-	}
 
-	if (!Autoshoot)
-		return false;
-
-	if (wep_slot < 2)
-	{
-		if (WaitForHS && !gLocalInfo.CanHeadShot)
-		{
-			if (class_num == TF2_Sniper)
-			{
-				if (wep_slot == 0 && pLocal->IsScoped())
-					return false;
-			}
-
-			else if (class_num == TF2_Spy)
-			{
-				if (wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador)
-					return false;
-			}
-		}
-	}
-
-	else if (wep_slot == 2)
-	{
-		if (AimMelee && !InRangeOnly)
-		{
-			if (!Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
-				return false;
-		}
-	}
-
-	//I think it's more logical to do ray checking after the cheaper checks pass
-
-	if (AimTime > 0.0f)
-	{
-		if (!AimFinished)
-		{
-			CProjectileWeapon ProjectileWep(wep);
-
-			if (ProjectileWep.GetWeaponInfo().speed > 0.0f)
+		if (AimTime > 0.0f && !AimFinished)
 				return false;
 
-			else //this is basically a triggerbot
+		if (!Utils::CanBackstab(cmd->viewangles, target.ptr->GetEyeAngles(), (target.ptr->GetWorldSpaceCenter() - pLocal->GetWorldSpaceCenter())))
+			return false;
+
+		if (!InRangeOnly && !Utils::CanMeleeHit(wep, cmd->viewangles, target.ptr->GetIndex()))
+			return false;
+
+		return true;
+	}
+
+	else
+	{
+		if (!Autoshoot)
+			return false;
+
+		if (wep_slot < 2)
+		{
+			int wep_idx = wep->GetItemDefinitionIndex();
+
+			if (WaitForHS && !gLocalInfo.CanHeadShot)
 			{
-				Vec3 vForward = Vec3();
-				Math::AngleVectors(cmd->viewangles, &vForward);
-				Vec3 vTraceStart = target.local_pos;
-				Vec3 vTraceEnd = (vTraceStart + (vForward * 9999.0f));
-
-				Ray_t ray;
-				ray.Init(vTraceStart, vTraceEnd);
-				CTraceFilter filter;
-				filter.pSkip = pLocal;
-				CGameTrace trace;
-				gInts.EngineTrace->TraceRay(ray, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
-
-				static float timer = gInts.Globals->curtime;
-
-				//if we're already on a target, shoot even if aim (smooth) hasn't finished
-				if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex())
+				if (class_num == TF2_Sniper)
 				{
-					if (target.ptr->IsPlayer() && GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
-						return false;
-
-					if ((gInts.Globals->curtime - timer) < 0.07f) //wait a bit (70ms) so we don't shoot the very edge of the hitbox
+					if (wep_slot == 0 && pLocal->IsScoped())
 						return false;
 				}
 
-				else
+				else if (class_num == TF2_Spy)
 				{
-					timer = gInts.Globals->curtime;
+					if (wep_idx == Spy_m_TheAmbassador || wep_idx == Spy_m_FestiveAmbassador)
+						return false;
+				}
+			}
+		}
+
+		else if (wep_slot == 2)
+		{
+			if (AimMelee && !InRangeOnly)
+			{
+				if (!Utils::CanMeleeHit(wep, target.ang_to_ent, target.ptr->GetIndex()))
 					return false;
+			}
+		}
+
+		//I think it's more logical to do ray checking after the cheaper checks pass
+
+		if (AimTime > 0.0f)
+		{
+			if (!AimFinished)
+			{
+				CProjectileWeapon ProjectileWep(wep);
+
+				if (ProjectileWep.GetWeaponInfo().speed > 0.0f)
+					return false;
+
+				else //this is basically a triggerbot
+				{
+					Vec3 vForward = Vec3();
+					Math::AngleVectors(cmd->viewangles, &vForward);
+					Vec3 vTraceStart = target.local_pos;
+					Vec3 vTraceEnd = (vTraceStart + (vForward * 9999.0f));
+
+					Ray_t ray;
+					ray.Init(vTraceStart, vTraceEnd);
+					CTraceFilter filter;
+					filter.pSkip = pLocal;
+					CGameTrace trace;
+					gInts.EngineTrace->TraceRay(ray, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
+
+					static float timer = gInts.Globals->curtime;
+
+					//if we're already on a target, shoot even if aim (smooth) hasn't finished
+					if (trace.m_pEnt && trace.m_pEnt->GetIndex() == target.ptr->GetIndex())
+					{
+						if (target.ptr->IsPlayer() && GetAimHitbox(pLocal, wep) == HITBOX_HEAD && trace.hitbox != HITBOX_HEAD)
+							return false;
+
+						if ((gInts.Globals->curtime - timer) < 0.07f) //wait a bit (70ms) so we don't shoot the very edge of the hitbox
+							return false;
+					}
+
+					else
+					{
+						timer = gInts.Globals->curtime;
+						return false;
+					}
 				}
 			}
 		}

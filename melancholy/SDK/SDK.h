@@ -479,8 +479,19 @@ namespace Utils
 		CGameTrace trace;
 		gInts.EngineTrace->TraceRay(ray, MASK_SHOT_HULL, &filter, &trace); //not sure if MASK_SHOT_HULL is neccessary
 
-		if (trace.m_pEnt && trace.m_pEnt->GetIndex() == nEntityIndex)
-			return true;
+		if (trace.m_pEnt)
+		{
+			int idx = trace.m_pEnt->GetIndex();
+
+			if (idx == nEntityIndex)
+				return true;
+
+			else //in case if for some reason multiple players are inside of each other
+			{
+				if (trace.m_pEnt->GetTeamNum() != pOwner->GetTeamNum())
+					return true;
+			}
+		}
 
 		return false;
 	}

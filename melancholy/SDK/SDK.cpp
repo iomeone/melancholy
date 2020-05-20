@@ -573,7 +573,7 @@ bool CTraceFilterNoPlayers::ShouldHitEntity(void *pEntityHandle, int nContentsMa
 		case 117:
 		case 225:
 		case CTFPlayer:
-		case CBaseAnimating:
+		//case CBaseAnimating:
 		case CTFAmmoPack: {
 			return false;
 		}
