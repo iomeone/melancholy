@@ -88,7 +88,7 @@ ProjectileInfo_t CProjectileWeapon::GetWeaponInfo() const
 		}
 
 		case Demoman_m_TheLochnLoad: {
-			out = { 1513.3f, 0.4f };
+			out = { 1513.3f, 0.4f, true };
 			break;
 		}
 
@@ -160,7 +160,7 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 	const Vec3 v	= (target - origin);
 	const float dx	= sqrt(v.x * v.x + v.y * v.y);
 	const float v0	= weapon.GetWeaponInfo().speed;
-	const float g	= (800.0f * weapon.GetWeaponInfo().gravity);
+	const float g	= (800.0f * weapon.GetWeaponInfo().gravity); //oops 800 fix later
 
 	if (g > 0.0f) 
 	{
@@ -183,7 +183,14 @@ bool Solve2D(const Vec3 &origin, const CProjectileWeapon &weapon, const Vec3 &ta
 	return true;
 }
 
-bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground)
+bool Solve(const Vec3 &origin,
+	const CProjectileWeapon &weapon,
+	const CPredictor &target,
+	Solution_t &sol,
+	bool on_ground,
+	float on_ground_hit_height,
+	const Vec3 &local_angles,
+	CBaseEntity *pLocal)
 {
 	static const float MAX_TIME = 1.5f;
 	static const float TIME_STEP = (MAX_TIME / 256.0f);
@@ -193,8 +200,13 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 	CTraceFilterNoPlayers filter;
 	filter.pSkip = target.ptr;
 
-	INetChannelInfo *net_chan = reinterpret_cast<INetChannelInfo *>(gInts.Engine->GetNetChannelInfo());
-	static ConVar *cl_interp = gInts.ConVars->FindVar("cl_interp");
+	INetChannelInfo *net_chan			= reinterpret_cast<INetChannelInfo *>(gInts.Engine->GetNetChannelInfo());
+	static ConVar *cl_interp			= gInts.ConVars->FindVar("cl_interp");
+	static ConVar *cl_flipviewmodels	= gInts.ConVars->FindVar("cl_flipviewmodels");
+	bool is_vm_flipped					= (cl_flipviewmodels->GetInt() ? true : false);
+
+	Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
+	Math::AngleVectors(local_angles, &vecForward, &vecRight, &vecUp);
 
 	for (float target_time = 0.0f; target_time <= MAX_TIME; target_time += TIME_STEP)
 	{
@@ -208,14 +220,32 @@ bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor
 		gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
 		if (trace.DidHit())
-			predicted_pos.z = (trace.endpos.z + (target.ptr->GetViewOffset().z * 0.5f));
+			predicted_pos.z = (trace.endpos.z + on_ground_hit_height);
 
 		if (!Solve2D(origin, weapon, predicted_pos, sol))
 			return false;
 
 		if (sol.time < target_time)
 		{
-			ray.Init(predicted_pos, origin);
+			Vec3 local_pos = Vec3();
+
+			switch (pLocal->GetClassNum()) 
+			{
+				//only need to vischeck from here and not actually offset the shoot pos...
+				//also many weapons have their own offsets but only rockets are of concern (shooting yourself when peeking)
+				case TF2_Soldier: {
+					Vec3 vecOffset = Vec3(23.5f, (is_vm_flipped ? -12.0f : 12.0f), (pLocal->IsDucking() ? 8.0f : -3.0f));
+					local_pos = origin + (vecForward * vecOffset.x) + (vecRight * vecOffset.y) + (vecUp * vecOffset.z);
+					break;
+				}
+
+				default: {
+					local_pos = origin;
+					break;
+				}
+			}
+
+			ray.Init(predicted_pos, local_pos);
 			gInts.EngineTrace->TraceRay(ray, MASK_PLAYERSOLID, &filter, &trace);
 
 			if (trace.fraction < 0.99f)

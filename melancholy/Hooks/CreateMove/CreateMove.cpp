@@ -28,5 +28,11 @@ bool __fastcall CreateMove::Hook(void *client_mode, int edx, float input_sample_
 		}
 	}
 
+	//lbutton smooth shoot thingy thing
+	if (gAimbot.AimKey == 1) {
+		if ((cmd->buttons & IN_ATTACK) && (gAimbot.AimTime > 0.0f && !gAimbot.AimFinished))
+			cmd->buttons &= ~IN_ATTACK; //not perfect but it works
+	}
+
 	return (gAimbot.Silent ? false : original);
 }

@@ -1,9 +1,11 @@
 #pragma once
 #include "../../../SDK/SDK.h"
 
-struct ProjectileInfo_t {
-	float speed		= 0.0f;
-	float gravity	= 0.0f;
+struct ProjectileInfo_t
+{
+	float speed			= 0.0f;
+	float gravity		= 0.0f;
+	bool is_loch_n_load = false;
 };
 
 class CProjectileWeapon {
@@ -33,4 +35,12 @@ struct Solution_t {
 	float time	= 0.0f;
 };
 
-bool Solve(const Vec3 &origin, const CProjectileWeapon &weapon, const CPredictor &target, Solution_t &sol, bool on_ground);
+//the amount of shit passed into this is getting out of hand
+bool Solve(const Vec3 &origin,
+	const CProjectileWeapon &weapon,
+	const CPredictor &target,
+	Solution_t &sol,
+	bool on_ground,
+	float on_ground_hit_height,
+	const Vec3 &local_angles,
+	CBaseEntity *pLocal);

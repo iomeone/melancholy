@@ -2,8 +2,7 @@
 
 Vec3 SmoothStartAngle	= Vec3();
 float SmoothStartTime	= 0.0f;
-bool AimFinished		= false;	//used for projectile autoshoot
-int OldAimPoint			= -1;		//used for reseting smoothing
+int OldAimPoint			= -1; //used for reseting smoothing
 
 CAimbot::Target_t CAimbot::GetTarget(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCmd *cmd)
 {
@@ -147,24 +146,34 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		Vec3 target_acceleration = (IsTargetPlayer ? (gravity * ((target.ptr->GetCondEx2() & TFCondEx2_Parachute) ? 0.224f : 1.0f)) : Vec3(0.0f, 0.0f, 0.0f));
 		bool target_onground	 = (IsTargetPlayer ? target.ptr->IsOnGround() : true);
 
-		static ConVar *cl_flipviewmodels = gInts.ConVars->FindVar("cl_flipviewmodels");
-		bool is_vm_flipped = (cl_flipviewmodels->GetInt() ? true : false);
+		float ground_hit_height = 0.0f;
 
 		switch (local_class)
 		{
 			case TF2_Soldier: {
-				Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
-				Math::AngleVectors(cmd->viewangles, &vecForward, &vecRight, &vecUp);
-				Vec3 vecOffset = Vec3(23.5f, (is_vm_flipped ? -12.0f : 12.0f), (pLocal->IsDucking() ? 8.0f : -3.0f));
-				target.local_pos += (vecForward * vecOffset.x) + (vecRight * vecOffset.y) + (vecUp * vecOffset.z);
 				target.ent_pos.z -= (IsTargetPlayer ? 30.0f : 0.0f);
+				ground_hit_height = (target.ptr->GetViewOffset().z * 0.5f);
 				break;
 			}
 
-			case TF2_Demoman: {
-				//Vec3 vecOffset = Vec3(16.0f, (is_vm_flipped ? -6.0f : 6.0f /*8.0f in the game code but it's wrong?*/), -6.0f);
-				//target.local_pos += (vecForward * vecOffset.x) + (vecRight * vecOffset.y) + (vecUp * vecOffset.z);
-				target.ent_pos.z -= (IsTargetPlayer ? (!target_onground && target_velocity.z < 0.0f ? 50.0f : 30.0f) : 0.0f);
+			case TF2_Demoman:
+			{
+				target.ent_pos.z -= (IsTargetPlayer ? 20.0f : 0.0f);
+
+				Vec3 vecDelta = (target.ent_pos - target.local_pos);
+				float fRange = Math::VectorNormalize(vecDelta);
+				float fElevationAngle = (fRange * (ProjectileInfo.is_loch_n_load ? 0.006f : 0.009f));
+
+				if (fElevationAngle > 45.0f)
+					fElevationAngle = 45.0f;
+
+				float s = 0.0f, c = 0.0f;
+				Math::SinCos((fElevationAngle * PI / 180.0f), &s, &c);
+
+				float fElevation = (fRange * s / c);
+
+				target.ent_pos.z += (c > 0.0f ? fElevation : 0.0f);
+				ground_hit_height = fElevation;
 				break;
 			}
 		}
@@ -172,22 +181,18 @@ bool CAimbot::CorrectAimPos(CBaseEntity *pLocal, CBaseCombatWeapon *wep, CUserCm
 		CPredictor Predictor(target.ent_pos, target_velocity, target_acceleration, target.ptr);
 		Solution_t Solution = {};
 
-		if (!Solve(target.local_pos, ProjectileWep, Predictor, Solution, target_onground))
+		if (!Solve(target.local_pos, ProjectileWep, Predictor, Solution, target_onground, ground_hit_height, cmd->viewangles, pLocal))
 			return false;
 
 		target.ang_to_ent = { -RAD2DEG(Solution.pitch), RAD2DEG(Solution.yaw), 0.0f };
 
-		////post pred corrections
-		/*if (local_class == TF2_Demoman && IsTargetPlayer)
-		{
+		if (local_class == TF2_Demoman) {
 			Vec3 vecForward = Vec3(), vecRight = Vec3(), vecUp = Vec3();
 			Math::AngleVectors(target.ang_to_ent, &vecForward, &vecRight, &vecUp);
-			float flThing = (target.local_pos.DistTo(target.ent_pos) / ProjectileInfo.speed);
-			float flUp = Math::MapFloat(flThing, 0.6f, 60.0f, 0.0f, 200.0f);
-			Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * flUp));
+			Vec3 vecVelocity = ((vecForward * ProjectileInfo.speed) - (vecUp * 200.0f));
 			Math::VectorAngles(vecVelocity, target.ang_to_ent);
-		}*/
-		
+		}
+
 		target.fov = Math::CalcFov(cmd->viewangles, target.ang_to_ent);
 	}
 

@@ -515,4 +515,14 @@ namespace Math
 
 		else return (-2 * p * p) + (4 * p) - 1;
 	}
+
+	inline float VectorNormalize(Vec3 &vec)
+	{
+		float mag = vec.Length();
+		float den = 1.f / (mag + FLT_EPSILON);
+		vec.x *= den;
+		vec.y *= den;
+		vec.z *= den;
+		return mag;
+	}
 }
